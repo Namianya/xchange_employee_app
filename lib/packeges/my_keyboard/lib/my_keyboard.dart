@@ -76,22 +76,32 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
             ],
           ),
           ButtonBar(
-            alignment: widget.mainAxisAlignment,
+            alignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               _calcButton('0'),
               InkWell(
+                  splashColor: Colors.green[900],
                   borderRadius: BorderRadius.circular(45),
                   onTap: widget.leftButtonFn,
                   child: Container(
                       alignment: Alignment.center,
-                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      width: 100,
                       height: 50,
                       child: widget.leftIcon)),
               InkWell(
+                  splashColor: Colors.red[900],
                   borderRadius: BorderRadius.circular(45),
                   onTap: widget.rightButtonFn,
                   child: Container(
                       alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: Colors.red[400],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
                       width: 50,
                       height: 50,
                       child: widget.rightIcon))
@@ -135,8 +145,8 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
         backgroundColor: Colors.grey[200],
         padding: const EdgeInsets.all(20),
       ),
-      child: Text(value,
-          style: Theme.of(context).textTheme.headline5?.copyWith()),
+      child:
+          Text(value, style: Theme.of(context).textTheme.headline5?.copyWith()),
     );
   }
 }

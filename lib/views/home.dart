@@ -10,6 +10,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String text = '';
+  String dropdownValue = "Ksh";
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +48,14 @@ class _HomeState extends State<Home> {
                 text = '';
               });
             },
+            leftIcon: const Icon(
+              Icons.done,
+              color: Colors.white,
+              size: 30,
+            ),
             rightIcon: const Icon(
               Icons.backspace,
-              color: Colors.red,
+              color: Colors.white,
             ),
           ),
         ],
@@ -61,5 +67,45 @@ class _HomeState extends State<Home> {
     setState(() {
       text = text + value;
     });
+  }
+}
+
+/// This is the stateful widget that the main application instantiates.
+class _CurrencyDropDown extends StatefulWidget {
+  const _CurrencyDropDown({Key? key}) : super(key: key);
+
+  @override
+  State<_CurrencyDropDown> createState() => _CurrencyDropDownState();
+}
+
+/// This is the private State class that goes with MyStatefulWidget.
+class _CurrencyDropDownState extends State<_CurrencyDropDown> {
+  String dropdownValue = 'One';
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          dropdownValue = newValue!;
+        });
+      },
+      items: <String>['One', 'Two', 'Free', 'Four']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
   }
 }

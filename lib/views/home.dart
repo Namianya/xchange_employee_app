@@ -10,7 +10,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String text = '';
-  String dropdownValue = "Ksh";
+  String buyingDropdownValue = "Ksh";
+  String sellingDropdownValue = "Ush";
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +31,79 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      // body: GridView.count(
-      //   crossAxisCount: 3,
-      //   crossAxisSpacing: 20,
-      //   mainAxisSpacing: 10,
-      //   children: List.generate(9, (index) =>  DiallerButton(value: index,)),
-      // ),
       body: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              DropdownButton<String>(
+                value: buyingDropdownValue,
+                icon: const Icon(
+                  Icons.arrow_drop_down_sharp,
+                  color: Colors.green,
+                ),
+                iconSize: 24,
+                elevation: 16,
+                style: Theme.of(context).textTheme.headline6,
+                underline: Container(
+                  height: 2,
+                  color: Colors.green,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    buyingDropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Ksh',
+                  'Ush',
+                  'USD',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              DropdownButton<String>(
+                value: sellingDropdownValue,
+                icon: const Icon(
+                  Icons.arrow_drop_down_sharp,
+                  color: Colors.orange,
+                ),
+                iconSize: 24,
+                elevation: 16,
+                style: Theme.of(context).textTheme.headline6,
+                underline: Container(
+                  height: 2,
+                  color: Colors.orange,
+                ),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    sellingDropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Ksh',
+                  'Ush',
+                  'USD',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
           const Spacer(),
-          Text(text),
+          Text(
+            text,
+            style: Theme.of(context)
+                .textTheme
+                .headline4
+                ?.copyWith(color: Colors.black),
+          ),
           NumericKeyboard(
             onKeyboardTap: onKeyboardTap,
             rightButtonFn: () {
@@ -67,45 +131,5 @@ class _HomeState extends State<Home> {
     setState(() {
       text = text + value;
     });
-  }
-}
-
-/// This is the stateful widget that the main application instantiates.
-class _CurrencyDropDown extends StatefulWidget {
-  const _CurrencyDropDown({Key? key}) : super(key: key);
-
-  @override
-  State<_CurrencyDropDown> createState() => _CurrencyDropDownState();
-}
-
-/// This is the private State class that goes with MyStatefulWidget.
-class _CurrencyDropDownState extends State<_CurrencyDropDown> {
-  String dropdownValue = 'One';
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
-      iconSize: 24,
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
-      },
-      items: <String>['One', 'Two', 'Free', 'Four']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
   }
 }

@@ -8,7 +8,10 @@ class ProfilePage extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(
+          'Profile',
+          style: Theme.of(context).textTheme.headline5,
+        ),
         centerTitle: true,
       ),
       body: Column(

@@ -13,21 +13,11 @@ class ProfilePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
-                ),
-              );
-            },
-            child: Hero(
-              tag: 'avatar',
-              child: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor,
-                radius: size.width * 0.37,
-              ),
+          Hero(
+            tag: 'avatar',
+            child: CircleAvatar(
+              backgroundColor: Theme.of(context).primaryColor,
+              radius: size.width * 0.3,
             ),
           ),
           const SizedBox(
@@ -46,7 +36,7 @@ class ProfilePage extends StatelessWidget {
           ),
           Text(
             'Employee Name',
-            style: Theme.of(context).textTheme.bodyText1,
+            style: Theme.of(context).textTheme.headline5,
           ),
           const SizedBox(
             height: 30,
@@ -60,7 +50,7 @@ class ProfilePage extends StatelessWidget {
           ),
           Text(
             'Employee',
-            style: Theme.of(context).textTheme.bodyText1,
+            style: Theme.of(context).textTheme.headline5,
           )
         ],
       ),

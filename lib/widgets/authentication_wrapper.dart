@@ -13,6 +13,6 @@ class AuthenticationWrapper extends StatelessWidget {
     if (firebaseUser != null) {
       return const Home();
     }
-    return LoginPage();
+    return const LoginPage();
   }
 }

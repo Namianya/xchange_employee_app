@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:xchange/views/confirm_password.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class ConfirmOTP extends StatelessWidget {
+  const ConfirmOTP({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

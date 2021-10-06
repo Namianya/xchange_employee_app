@@ -20,6 +20,7 @@ class _SIdeCalcButtonState extends State<SIdeCalcButton> {
 
 
 
+  // ignore: unused_element
   Widget _calcButton(String value) {
     return TextButton(
       onPressed: () {
@@ -30,7 +31,7 @@ class _SIdeCalcButtonState extends State<SIdeCalcButton> {
         backgroundColor: Colors.grey[200],
         padding: const EdgeInsets.all(20),
       ),
-      child: Text('$value',
+      child: Text(value,
           style: Theme.of(context).textTheme.headline5?.copyWith()),
     );
   }

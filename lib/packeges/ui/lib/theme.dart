@@ -12,11 +12,12 @@ ThemeData myTheme = ThemeData(
         borderRadius: BorderRadius.circular(15),
       ),
     ),
+    // ignore: deprecated_member_use
     buttonColor: Colors.indigo,
     elevatedButtonTheme:
-        ElevatedButtonThemeData(style: ButtonStyle().copyWith()),
+        ElevatedButtonThemeData(style: const ButtonStyle().copyWith()),
     scaffoldBackgroundColor: Colors.white,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       titleTextStyle: TextStyle(
         color: Colors.black,
       ),
@@ -33,6 +34,6 @@ ThemeData myTheme = ThemeData(
       ),
     ),
     textTheme: TextTheme(
-        bodyText2: TextStyle().copyWith(
+        bodyText2: const TextStyle().copyWith(
       fontWeight: FontWeight.bold,
     )), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.indigo));

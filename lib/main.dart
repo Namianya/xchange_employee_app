@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/theme.dart';
 import 'package:xchange/services/auth_service.dart';
-import 'package:xchange/views/home.dart';
-import 'package:xchange/views/login.dart';
 import 'package:xchange/widgets/authentication_wrapper.dart';
 
 Future<void> main() async {
@@ -31,7 +29,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: myTheme,
-        home: AuthenticationWrapper(),
+        home: const AuthenticationWrapper(),
       ),
     );
   }

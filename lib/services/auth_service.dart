@@ -5,14 +5,20 @@ class AuthService {
   AuthService(this._firebaseAuth);
   Future<String?> signIn({required String phoneNumber}) async {
     try {
-      await _firebaseAuth.signInWithPhoneNumber(phoneNumber);
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException e) {},
+        codeSent: (String verificationId, int? resendToken) {},
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
   }
   // Future<String?> signUp({required String phoneNumber}) async {
   //   try {
-  //     await _firebaseAuth.verifyPhoneNumber(phoneNumber: phoneNumber, verificationCompleted: verificationCompleted, verificationFailed: verificationFailed, codeSent: codeSent, codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+  //     await _firebaseAuth.verifyPhoneNumber(phoneNumber: phoneNumber, verificationCompleted: (authCredential){}, verificationFailed: verificationFailed, codeSent: codeSent, codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
   //   } on FirebaseAuthException catch (e) {
   //     return e.message;
   //   }

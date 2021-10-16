@@ -32,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
     borderRadius: BorderRadius.circular(15.0),
   );
   TextEditingController phoneNumber = TextEditingController();
+  TextEditingController firstName = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +52,16 @@ class _LoginPageState extends State<LoginPage> {
           FirebaseFirestore.instance
               .collection('user')
               .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
-              .set({
-            'number': FirebaseAuth.instance.currentUser!.phoneNumber,
-            'time': FieldValue.serverTimestamp()
-          });
+              .set(
+                {
+                  'number': FirebaseAuth.instance.currentUser!.phoneNumber,
+                  'name': firstName.text,
+                  'time': FieldValue.serverTimestamp()
+                },
+                SetOptions(merge: true),
+              )
+              .then((value) => print("data merged with existing data"))
+              .catchError((error) => print('Failed to merge: $error'));
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => const Home()));
         }
@@ -143,7 +150,21 @@ class _LoginPageState extends State<LoginPage> {
                             icon: const Icon(Icons.phone)),
                       ),
                     ),
-                    const Text('Start with country code eg +254 7******')
+                    const Text('Start with country code eg +254 7******'),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        controller: firstName,
+                        autofocus: true,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                            focusColor: Theme.of(context).primaryColor,
+                            border: const OutlineInputBorder(),
+                            label: const Text('First Name'),
+                            icon: const Icon(Icons.person)),
+                      ),
+                    ),
+                    const Text('Enter your first name')
                   ],
                 )
               : Padding(

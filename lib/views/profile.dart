@@ -60,7 +60,19 @@ class ProfilePage extends StatelessWidget {
           Text(
             'Employee',
             style: Theme.of(context).textTheme.headline5,
-          )
+          ),
+          const Spacer(),
+          // ElevatedButton.icon(
+          //   style: ElevatedButton.styleFrom(primary: Colors.red),
+          //   onPressed: () async {
+          //     await FirebaseAuth.instance.signOut();
+          //   },
+          //   icon: const Icon(
+          //     Icons.logout,
+          //     color: Colors.white,
+          //   ),
+          //   label: const Text('Logout'),
+          // ),
         ],
       ),
     );

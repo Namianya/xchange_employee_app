@@ -7,15 +7,17 @@ typedef KeyboardTapCallback = void Function(String text);
 class NumericKeyboard extends StatefulWidget {
   /// Color of the text [default = Colors.black]
   final Color textColor;
+  final Color? leftButtonColor;
+  final Color? rightButtonColor;
 
   /// Display a custom right icon
-  final Icon? rightIcon;
+  final Widget? rightIcon;
 
   /// Action to trigger when right button is pressed
   final Function()? rightButtonFn;
 
   /// Display a custom left icon
-  final Icon? leftIcon;
+  final Widget? leftIcon;
 
   /// Action to trigger when left button is pressed
   final Function()? leftButtonFn;
@@ -34,7 +36,7 @@ class NumericKeyboard extends StatefulWidget {
       this.rightIcon,
       this.leftButtonFn,
       this.leftIcon,
-      this.mainAxisAlignment = MainAxisAlignment.spaceEvenly})
+      this.mainAxisAlignment = MainAxisAlignment.spaceEvenly, this.leftButtonColor, this.rightButtonColor})
       : super(key: key);
 
   @override
@@ -86,7 +88,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                   child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: widget.leftButtonColor ?? Colors.green,
                         borderRadius: BorderRadius.circular(25),
                       ),
                       width: 100,
@@ -99,7 +101,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                   child: Container(
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.red[400],
+                        color: widget.rightButtonColor ?? Colors.red[400],
                         borderRadius: BorderRadius.circular(15),
                       ),
                       width: 50,

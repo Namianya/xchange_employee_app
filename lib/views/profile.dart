@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -6,6 +7,8 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -19,7 +22,10 @@ class ProfilePage extends StatelessWidget {
           Hero(
             tag: 'avatar',
             child: CircleAvatar(
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: Colors.grey[100],
+              child: const FlutterLogo(
+                size: 100,
+              ),
               radius: size.width * 0.3,
             ),
           ),
@@ -31,14 +37,14 @@ class ProfilePage extends StatelessWidget {
             height: 16,
           ),
           Text(
-            'Name',
+            'Number',
             style: Theme.of(context).textTheme.subtitle1,
           ),
           const SizedBox(
             height: 16,
           ),
           Text(
-            'Employee Name',
+            '$num',
             style: Theme.of(context).textTheme.headline5,
           ),
           const SizedBox(

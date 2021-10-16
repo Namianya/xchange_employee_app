@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_keyboard/my_keyboard.dart';
 import 'package:xchange/views/profile.dart';
@@ -12,10 +14,16 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String text = '';
   String buyingDropdownValue = "Ksh";
-  String sellingDropdownValue = "Ush";
-  int rate = 1;
+  String sellingDropdownValue = "rate";
+  double rate = 0;
   double result = 0;
-  bool buyOrSell = true;
+  bool isBuying = true;
+  bool isResult = false;
+  bool isLoading = false;
+
+  // double kshRate = double.parse(data['Ksh']);
+  // double ushRate = double.parse(data['Ush']);
+  // double usdRate = double.parse(data['Usd']);
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +45,7 @@ class _HomeState extends State<Home> {
             child: const Hero(
               tag: 'avatar',
               child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=387&q=80'),
+                child: FlutterLogo(),
                 radius: 20,
               ),
             ),
@@ -52,19 +59,20 @@ class _HomeState extends State<Home> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            // mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButton<String>(
                 value: buyingDropdownValue,
-                icon: const Icon(
+                icon: Icon(
                   Icons.arrow_drop_down_sharp,
-                  color: Colors.green,
+                  color: isBuying ? Colors.green : Colors.orange,
                 ),
                 iconSize: 24,
                 elevation: 16,
                 style: Theme.of(context).textTheme.headline6,
                 underline: Container(
                   height: 2,
-                  color: Colors.green,
+                  color: isBuying ? Colors.green : Colors.orange,
                 ),
                 onChanged: (String? newValue) {
                   setState(() {
@@ -80,35 +88,119 @@ class _HomeState extends State<Home> {
                   );
                 }).toList(),
               ),
-              DropdownButton<String>(
-                value: sellingDropdownValue,
-                icon: const Icon(
-                  Icons.arrow_drop_down_sharp,
-                  color: Colors.orange,
-                ),
-                iconSize: 24,
-                elevation: 16,
-                style: Theme.of(context).textTheme.headline6,
-                underline: Container(
-                  height: 2,
-                  color: Colors.orange,
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    sellingDropdownValue = newValue!;
-                  });
+              StreamBuilder<DocumentSnapshot>(
+                stream: isBuying
+                    ? FirebaseFirestore.instance
+                        .collection('buyingRate')
+                        .doc('6PKMVxXXAvwAxhdcDZsr')
+                        .snapshots()
+                    : FirebaseFirestore.instance
+                        .collection('sellingRate')
+                        .doc('dLLxgZBJkAayNKDqLOMX')
+                        .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return const Icon(
+                      Icons.error,
+                      color: Colors.red,
+                    );
+                  }
+                  if (snapshot.hasData && !snapshot.data!.exists) {
+                    return const Icon(
+                      Icons.warning,
+                      color: Colors.orange,
+                    );
+                  }
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    Map<String, dynamic> data =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    // sellingDropdownValue = 'USH: ${data['Ush']}';
+
+                    return DropdownButton<String?>(
+                      value: sellingDropdownValue,
+                      icon: Icon(
+                        Icons.arrow_drop_down_sharp,
+    
+                        color: isBuying ? Colors.green : Colors.orange,
+                      ),
+                      iconSize: 24,
+                      elevation: 16,
+                      style: Theme.of(context).textTheme.headline6,
+                      underline: Container(
+                        height: 2,
+                        color: isBuying ? Colors.green : Colors.orange,
+                      ),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          sellingDropdownValue = newValue!;
+                        });
+
+                        if (sellingDropdownValue == 'KSH: ${data['Ksh']}') {
+                          setState(() {
+                            rate = double.parse('${data['Ksh']}');
+                          });
+                        } else if (sellingDropdownValue ==
+                            'USH: ${data['Ush']}') {
+                          setState(() {
+                            rate = double.parse('${data['Ush']}');
+                          });
+                        } else if (sellingDropdownValue ==
+                            'USD: ${data['Usd']}') {
+                          setState(() {
+                            rate = double.parse('${data['Usd']}');
+                          });
+                        } else {
+                          rate = 1.0;
+                        }
+                      },
+                      items: <String>[
+                        'rate',
+                        'KSH: ${data['Ksh']}',
+                        'USH: ${data['Ush']}',
+                        'USD: ${data['Usd']}',
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    );
+                  }
+
+                  return const CircularProgressIndicator();
                 },
-                items: <String>[
-                  'Ksh',
-                  'Ush',
-                  'USD',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
               ),
+
+              // DropdownButton<String>(
+              //   value: sellingDropdownValue,
+              //   icon: const Icon(
+              //     Icons.arrow_drop_down_sharp,
+              //     color: Colors.orange,
+              //   ),
+              //   iconSize: 24,
+              //   elevation: 16,
+              //   style: Theme.of(context).textTheme.headline6,
+              //   underline: Container(
+              //     height: 2,
+              //     color: Colors.orange,
+              //   ),
+              //   onChanged: (String? newValue) {
+              //     setState(() {
+              //       sellingDropdownValue = newValue!;
+              //     });
+              //   },
+              //   items: <String>[
+              //     'Ksh',
+              //     'Ush',
+              //     'USD',
+              //   ].map<DropdownMenuItem<String>>((String value) {
+              //     return DropdownMenuItem<String>(
+              //       value: value,
+              //       child: Text(value),
+              //     );
+              //   }).toList(),
+              // ),
             ],
           ),
           Row(
@@ -117,32 +209,33 @@ class _HomeState extends State<Home> {
               Text(
                 '1',
                 style: Theme.of(context).textTheme.headline4?.copyWith(
-                      color: Colors.green,
+                      color: isBuying ? Colors.green : Colors.orange,
                     ),
               ),
               Text(
                 '$rate',
                 style: Theme.of(context).textTheme.headline4?.copyWith(
-                      color: Colors.orange,
+                      color: isBuying ? Colors.green : Colors.orange,
                     ),
               ),
             ],
           ),
           const Spacer(),
           ElevatedButton.icon(
-            icon: buyOrSell
+            icon: isBuying
                 ? const Icon(Icons.arrow_forward)
                 : const Icon(Icons.arrow_back),
             onPressed: () {
               setState(() {
-                buyOrSell = !buyOrSell;
+                sellingDropdownValue = 'rate';
+                isBuying = !isBuying;
               });
             },
             label: Text(
-              buyOrSell ? 'BUYING' : 'SELLING',
+              isBuying ? 'BUYING' : 'SELLING',
             ),
             style: ElevatedButton.styleFrom(
-                primary: buyOrSell ? Colors.green : Colors.orange),
+                primary: isBuying ? Colors.green : Colors.orange),
           ),
           Text(
             'RESULT',
@@ -152,7 +245,9 @@ class _HomeState extends State<Home> {
             height: 25,
           ),
           Text(
-            '${result != 0 ? result : '_ _'} $sellingDropdownValue',
+            sellingDropdownValue == 'Rate'
+                ? 'Choose a rate'
+                : '${result != 0 ? result : '_ _'} ',
             style: Theme.of(context)
                 .textTheme
                 .headline3
@@ -170,25 +265,60 @@ class _HomeState extends State<Home> {
             onKeyboardTap: onKeyboardTap,
             leftButtonFn: () {
               setState(() {
-                result = double.parse(text) * rate;
+                isLoading = true;
+                if (text == '') {
+                  result = 0;
+                } else {
+                  if (isBuying) {
+                    result = double.parse(text) * rate;
+                  } else {
+                    result = double.parse(text) / rate;
+                  }
+                }
+                String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
+                // print(num);
+                FirebaseFirestore.instance.collection('transactions').add({
+                  'number': num,
+                  'rate': rate,
+                  'currency': sellingDropdownValue,
+                  'isBuying': isBuying,
+                  'result': result,
+                  'time': FieldValue.serverTimestamp()
+                });
+
+                isLoading = false;
+                // Future.delayed(Duration(seconds: 5)).then((value) {
+                //   setState(() {
+                //     text = '';
+                //     result = 0;
+                //   });
+                // });
               });
             },
             rightButtonFn: () {
-              setState(() {
-                // text = text.substring(0, text.length - 1);
-                text = '';
-                result = 0;
-              });
+              isLoading
+                  ? text
+                  : setState(() {
+                      // text = text.substring(0, text.length - 1);
+                      text = '';
+                      result = 0;
+                    });
             },
-            leftIcon: const Icon(
-              Icons.done,
-              color: Colors.white,
-              size: 30,
-            ),
-            rightIcon: const Icon(
-              Icons.backspace,
-              color: Colors.white,
-            ),
+            leftIcon: isLoading
+                ? const CircularProgressIndicator()
+                : const Icon(
+                    Icons.done,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+            rightButtonColor: isLoading ? Colors.grey : Colors.red[900],
+            leftButtonColor: isLoading ? Colors.grey : Colors.green,
+            rightIcon: isLoading
+                ? const CircularProgressIndicator()
+                : const Icon(
+                    Icons.backspace,
+                    color: Colors.white,
+                  ),
           ),
         ],
       ),

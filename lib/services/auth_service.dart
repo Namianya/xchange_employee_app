@@ -25,4 +25,5 @@ class AuthService {
   // }
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  
 }

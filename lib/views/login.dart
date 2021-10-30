@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   );
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController firstName = TextEditingController();
-
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     void signInWithPhoneAuthCredential(
@@ -85,42 +85,47 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
           onPressed: () async {
-            setState(() {
-              isLoading = true;
-            });
+            if (_formKey.currentState!.validate()) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('saving data ')),
+              );
+              setState(() {
+                isLoading = true;
+              });
 
-            await FirebaseAuth.instance.verifyPhoneNumber(
-              phoneNumber: phoneNumber.text,
-              verificationCompleted: (PhoneAuthCredential credential) async {
-                setState(() {
-                  isLoading = false;
-                });
-                // signInWithPhoneAuthCredential(credential);
-                // FirebaseFirestore.instance.collection('transactions').add({
-                //   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
-                //   'time': FieldValue.serverTimestamp()
-                // });
-              },
-              verificationFailed: (FirebaseAuthException e) async {
-                // _scaffoldKey.currentState!.showSnackBar(snackbar);
-                setState(() {
-                  isLoading = false;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                  'error: ${e.message}',
-                  style: Theme.of(context).textTheme.bodyText1,
-                )));
-              },
-              codeSent: (String verificationId, int? resendToken) async {
-                setState(() {
-                  isLoading = false;
-                  currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
-                  this.verificationId = verificationId;
-                });
-              },
-              codeAutoRetrievalTimeout: (String verificationId) async {},
-            );
+              await FirebaseAuth.instance.verifyPhoneNumber(
+                phoneNumber: phoneNumber.text,
+                verificationCompleted: (PhoneAuthCredential credential) async {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  // signInWithPhoneAuthCredential(credential);
+                  // FirebaseFirestore.instance.collection('transactions').add({
+                  //   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
+                  //   'time': FieldValue.serverTimestamp()
+                  // });
+                },
+                verificationFailed: (FirebaseAuthException e) async {
+                  // _scaffoldKey.currentState!.showSnackBar(snackbar);
+                  setState(() {
+                    isLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                    'error: ${e.message}',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  )));
+                },
+                codeSent: (String verificationId, int? resendToken) async {
+                  setState(() {
+                    isLoading = false;
+                    currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
+                    this.verificationId = verificationId;
+                  });
+                },
+                codeAutoRetrievalTimeout: (String verificationId) async {},
+              );
+            }
           }),
       appBar: AppBar(
         title: Text(
@@ -134,38 +139,53 @@ class _LoginPageState extends State<LoginPage> {
               child: CircularProgressIndicator(),
             )
           : currentState == MobileVerificationState.SHOW_MOBILE_FORM_STATE
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextField(
-                        controller: phoneNumber,
-                        autofocus: true,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                            focusColor: Theme.of(context).primaryColor,
-                            border: const OutlineInputBorder(),
-                            label: const Text('Phone Number'),
-                            icon: const Icon(Icons.phone)),
+              ? Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextFormField(
+                          controller: phoneNumber,
+                          autofocus: true,
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              focusColor: Theme.of(context).primaryColor,
+                              border: const OutlineInputBorder(),
+                              label: const Text('Phone Number'),
+                              icon: const Icon(Icons.phone)),
+                        ),
                       ),
-                    ),
-                    const Text('Start with country code eg +254 7******'),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextField(
-                        controller: firstName,
-                        autofocus: true,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                            focusColor: Theme.of(context).primaryColor,
-                            border: const OutlineInputBorder(),
-                            label: const Text('First Name'),
-                            icon: const Icon(Icons.person)),
+                      const Text('Start with country code eg +254 7******'),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextFormField(
+                          controller: firstName,
+                          autofocus: true,
+                          keyboardType: TextInputType.name,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              focusColor: Theme.of(context).primaryColor,
+                              border: const OutlineInputBorder(),
+                              label: const Text('First Name'),
+                              icon: const Icon(Icons.person)),
+                        ),
                       ),
-                    ),
-                    const Text('Enter your first name')
-                  ],
+                      const Text('Enter your first name')
+                    ],
+                  ),
                 )
               : Padding(
                   padding: const EdgeInsets.all(15.0),

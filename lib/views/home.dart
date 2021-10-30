@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -121,7 +123,6 @@ class _HomeState extends State<Home> {
                       value: sellingDropdownValue,
                       icon: Icon(
                         Icons.arrow_drop_down_sharp,
-    
                         color: isBuying ? Colors.green : Colors.orange,
                       ),
                       iconSize: 24,
@@ -270,9 +271,9 @@ class _HomeState extends State<Home> {
                   result = 0;
                 } else {
                   if (isBuying) {
-                    result = double.parse(text) * rate;
+                    result = (double.parse(text) * rate).toPrecision(2);
                   } else {
-                    result = double.parse(text) / rate;
+                    result = (double.parse(text) / rate).toPrecision(2);
                   }
                 }
                 String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
@@ -282,6 +283,7 @@ class _HomeState extends State<Home> {
                   'rate': rate,
                   'currency': sellingDropdownValue,
                   'isBuying': isBuying,
+                  'input': double.parse(text),
                   'result': result,
                   'time': FieldValue.serverTimestamp()
                 });
@@ -329,5 +331,12 @@ class _HomeState extends State<Home> {
     setState(() {
       text = text + value;
     });
+  }
+}
+
+extension Precision on double {
+  double toPrecision(int fractionDigits) {
+    num mod = pow(10, fractionDigits.toDouble());
+    return ((this * mod).round().toDouble() / mod);
   }
 }

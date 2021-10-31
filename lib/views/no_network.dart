@@ -6,20 +6,22 @@ class NoNetwork extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Icon(
-            Icons.wifi_off,
-            color: Colors.grey,
-            size: MediaQuery.of(context).size.width * 0.35,
-          ),
-          Text(
-            'Network Error',
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
-                  color: Colors.red,
-                ),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.wifi_off,
+              color: Colors.grey,
+              size: MediaQuery.of(context).size.width * 0.35,
+            ),
+            Text(
+              'Network Error',
+              style: Theme.of(context).textTheme.bodyText1?.copyWith(
+                    color: Colors.red,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_keyboard/my_keyboard.dart';
 import 'package:xchange/views/profile.dart';
 
@@ -22,6 +23,8 @@ class _HomeState extends State<Home> {
   bool isBuying = true;
   bool isResult = false;
   bool isLoading = false;
+  String ushName = '';
+  String usdName = '';
 
   // double kshRate = double.parse(data['Ksh']);
   // double ushRate = double.parse(data['Ush']);
@@ -118,90 +121,63 @@ class _HomeState extends State<Home> {
                     Map<String, dynamic> data =
                         snapshot.data!.data() as Map<String, dynamic>;
                     // sellingDropdownValue = 'USH: ${data['Ush']}';
+                    if (data != null) {
+                      ushName = 'USH: ${data['Ush']}';
+                      usdName = 'USD: ${data['Usd']}';
+                      return DropdownButton<String?>(
+                        value: ushName,
+                        icon: Icon(
+                          Icons.arrow_drop_down_sharp,
+                          color: isBuying ? Colors.green : Colors.orange,
+                        ),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: Theme.of(context).textTheme.headline6,
+                        underline: Container(
+                          height: 2,
+                          color: isBuying ? Colors.green : Colors.orange,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            sellingDropdownValue = newValue!;
+                          });
 
-                    return DropdownButton<String?>(
-                      value: sellingDropdownValue,
-                      icon: Icon(
-                        Icons.arrow_drop_down_sharp,
-                        color: isBuying ? Colors.green : Colors.orange,
-                      ),
-                      iconSize: 24,
-                      elevation: 16,
-                      style: Theme.of(context).textTheme.headline6,
-                      underline: Container(
-                        height: 2,
-                        color: isBuying ? Colors.green : Colors.orange,
-                      ),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          sellingDropdownValue = newValue!;
-                        });
-
-                        if (sellingDropdownValue == 'KSH: ${data['Ksh']}') {
-                          setState(() {
-                            rate = double.parse('${data['Ksh']}');
-                          });
-                        } else if (sellingDropdownValue ==
-                            'USH: ${data['Ush']}') {
-                          setState(() {
-                            rate = double.parse('${data['Ush']}');
-                          });
-                        } else if (sellingDropdownValue ==
-                            'USD: ${data['Usd']}') {
-                          setState(() {
-                            rate = double.parse('${data['Usd']}');
-                          });
-                        } else {
-                          rate = 1.0;
-                        }
-                      },
-                      items: <String>[
-                        'rate',
-                        'KSH: ${data['Ksh']}',
-                        'USH: ${data['Ush']}',
-                        'USD: ${data['Usd']}',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    );
+                          if (sellingDropdownValue == 'KSH: ${data['Ksh']}') {
+                            setState(() {
+                              rate = double.parse('${data['Ksh']}');
+                            });
+                          } else if (sellingDropdownValue == ushName) {
+                            setState(() {
+                              rate = double.parse('${data['Ush']}');
+                            });
+                          } else if (sellingDropdownValue == usdName) {
+                            setState(() {
+                              rate = double.parse('${data['Usd']}');
+                            });
+                          } else {
+                            rate = 1.0;
+                          }
+                        },
+                        items: <String>[
+                          // TODO: change to Ush as trrhe first choice
+                          
+                          ushName,
+                          usdName,
+                          'KSH: ${data['Ksh']}',
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      );
+                    }
                   }
 
                   return const CircularProgressIndicator();
                 },
               ),
 
-              // DropdownButton<String>(
-              //   value: sellingDropdownValue,
-              //   icon: const Icon(
-              //     Icons.arrow_drop_down_sharp,
-              //     color: Colors.orange,
-              //   ),
-              //   iconSize: 24,
-              //   elevation: 16,
-              //   style: Theme.of(context).textTheme.headline6,
-              //   underline: Container(
-              //     height: 2,
-              //     color: Colors.orange,
-              //   ),
-              //   onChanged: (String? newValue) {
-              //     setState(() {
-              //       sellingDropdownValue = newValue!;
-              //     });
-              //   },
-              //   items: <String>[
-              //     'Ksh',
-              //     'Ush',
-              //     'USD',
-              //   ].map<DropdownMenuItem<String>>((String value) {
-              //     return DropdownMenuItem<String>(
-              //       value: value,
-              //       child: Text(value),
-              //     );
-              //   }).toList(),
-              // ),
             ],
           ),
           Row(
@@ -214,13 +190,16 @@ class _HomeState extends State<Home> {
                     ),
               ),
               Text(
-                '$rate',
+                ushName,
                 style: Theme.of(context).textTheme.headline4?.copyWith(
                       color: isBuying ? Colors.green : Colors.orange,
                     ),
               ),
             ],
           ),
+          // TextFormField(
+          //   decoration:const  InputDecoration(labelText: 'From'),
+          // ),
           const Spacer(),
           ElevatedButton.icon(
             icon: isBuying
@@ -228,7 +207,7 @@ class _HomeState extends State<Home> {
                 : const Icon(Icons.arrow_back),
             onPressed: () {
               setState(() {
-                sellingDropdownValue = 'rate';
+                sellingDropdownValue = ushName;
                 isBuying = !isBuying;
               });
             },
@@ -246,7 +225,7 @@ class _HomeState extends State<Home> {
             height: 25,
           ),
           Text(
-            sellingDropdownValue == 'Rate'
+            sellingDropdownValue == rate
                 ? 'Choose a rate'
                 : '${result != 0 ? result : '_ _'} ',
             style: Theme.of(context)

@@ -19,6 +19,9 @@ class Store {
       ).limit(1)
       .snapshots();
  
+
+
+
   List<Rate> _buyingListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs
         .map((e) => Rate(

@@ -56,7 +56,22 @@ class _LoginPageState extends State<LoginPage> {
                 {
                   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
                   'name': firstName.text,
+                  'isActivated': false,
                   'time': FieldValue.serverTimestamp()
+                },
+                SetOptions(merge: true),
+              )
+              .then((value) => print("data merged with existing data"))
+              .catchError((error) => print('Failed to merge: $error'));
+          FirebaseFirestore.instance
+              .collection('assignedStock')
+              .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
+              .set(
+                {
+                  'ksh': 0,
+                  'usd': 0,
+                  'ush': 0,
+                  'createdOn': FieldValue.serverTimestamp()
                 },
                 SetOptions(merge: true),
               )

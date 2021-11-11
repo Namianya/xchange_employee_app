@@ -6,6 +6,7 @@ import 'package:xchange/network/connectivity_status.dart';
 import 'package:xchange/views/home.dart';
 import 'package:xchange/views/login.dart';
 import 'package:xchange/views/no_network.dart';
+import 'package:xchange/views/second_home.dart';
 
 class AuthenticationWrapper extends StatelessWidget {
   const AuthenticationWrapper({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class AuthenticationWrapper extends StatelessWidget {
     } else {
       if (firebaseUser != null) {
         return const Home();
+        // return SecondHome();
       }
       return const LoginPage();
     }

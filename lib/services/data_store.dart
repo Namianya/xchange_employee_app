@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:xchange/services/rate.dart';
+import 'package:fare_rate_mm/services/rate.dart';
 
 class Store {
   // final Stream<QuerySnapshot> buyingRateStream = FirebaseFirestore.instance

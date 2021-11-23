@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:connectivity/connectivity.dart';
-import 'package:xchange/network/connectivity_status.dart';
+import 'package:fare_rate_mm/network/connectivity_status.dart';
 class ConnectivityService {
   StreamController<ConnectivityStatus> connectionStatusController = StreamController<ConnectivityStatus>();
   ConnectivityService() {

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-import 'package:xchange/views/home.dart';
+import 'package:fare_rate_mm/views/home.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 enum MobileVerificationState {

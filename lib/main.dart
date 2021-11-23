@@ -4,9 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ui/theme.dart';
-import 'package:xchange/network/connectivity_service.dart';
-import 'package:xchange/services/auth_service.dart';
-import 'package:xchange/widgets/authentication_wrapper.dart';
+import 'package:fare_rate_mm/network/connectivity_service.dart';
+import 'package:fare_rate_mm/services/auth_service.dart';
+import 'package:fare_rate_mm/widgets/authentication_wrapper.dart';
 
 import 'network/connectivity_status.dart';
 

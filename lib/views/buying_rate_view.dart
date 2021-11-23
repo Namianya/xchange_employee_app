@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:xchange/services/data_store.dart';
-import 'package:xchange/services/rate.dart';
+import 'package:fare_rate_mm/services/data_store.dart';
+import 'package:fare_rate_mm/services/rate.dart';
 
 class BuyingRatesView extends StatelessWidget {
   const BuyingRatesView({Key? key}) : super(key: key);

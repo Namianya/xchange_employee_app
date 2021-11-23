@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_keyboard/my_keyboard.dart';
-import 'package:xchange/views/profile.dart';
+import 'package:fare_rate_mm/views/profile.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -17,7 +17,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String text = '';
   String buyingDropdownValue = "Ksh";
-  String sellingDropdownValue = "rate";
+  String sellingDropdownValue = "ush";
   double rate = 0;
   double result = 0;
   bool isBuying = true;
@@ -25,6 +25,8 @@ class _HomeState extends State<Home> {
   bool isLoading = false;
   String ushName = '';
   String usdName = '';
+
+
 
   // double kshRate = double.parse(data['Ksh']);
   // double ushRate = double.parse(data['Ush']);
@@ -125,7 +127,7 @@ class _HomeState extends State<Home> {
                       ushName = 'USH: ${data['Ush']}';
                       usdName = 'USD: ${data['Usd']}';
                       return DropdownButton<String?>(
-                        value: ushName,
+                        value: sellingDropdownValue,
                         icon: Icon(
                           Icons.arrow_drop_down_sharp,
                           color: isBuying ? Colors.green : Colors.orange,
@@ -142,11 +144,7 @@ class _HomeState extends State<Home> {
                             sellingDropdownValue = newValue!;
                           });
 
-                          if (sellingDropdownValue == 'KSH: ${data['Ksh']}') {
-                            setState(() {
-                              rate = double.parse('${data['Ksh']}');
-                            });
-                          } else if (sellingDropdownValue == ushName) {
+                          if (sellingDropdownValue == ushName) {
                             setState(() {
                               rate = double.parse('${data['Ush']}');
                             });
@@ -161,9 +159,9 @@ class _HomeState extends State<Home> {
                         items: <String>[
                           // TODO: change to Ush as trrhe first choice
                           
-                          ushName,
-                          usdName,
-                          'KSH: ${data['Ksh']}',
+                          'ush',
+                          'usd',
+
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -190,7 +188,7 @@ class _HomeState extends State<Home> {
                     ),
               ),
               Text(
-                ushName,
+                sellingDropdownValue=='ush'? ushName:usdName,
                 style: Theme.of(context).textTheme.headline4?.copyWith(
                       color: isBuying ? Colors.green : Colors.orange,
                     ),
@@ -207,7 +205,7 @@ class _HomeState extends State<Home> {
                 : const Icon(Icons.arrow_back),
             onPressed: () {
               setState(() {
-                sellingDropdownValue = ushName;
+                // sellingDropdownValue = rate.toString();
                 isBuying = !isBuying;
               });
             },

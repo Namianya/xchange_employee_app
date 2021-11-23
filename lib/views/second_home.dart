@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:xchange/views/profile.dart';
+import 'package:fare_rate_mm/views/profile.dart';
 
 class SecondHome extends StatefulWidget {
   const SecondHome({Key? key}) : super(key: key);

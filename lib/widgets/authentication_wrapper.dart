@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/src/provider.dart';
-import 'package:xchange/network/connectivity_status.dart';
-import 'package:xchange/views/home.dart';
-import 'package:xchange/views/login.dart';
-import 'package:xchange/views/no_network.dart';
-import 'package:xchange/views/second_home.dart';
+import 'package:fare_rate_mm/network/connectivity_status.dart';
+import 'package:fare_rate_mm/views/home.dart';
+import 'package:fare_rate_mm/views/login.dart';
+import 'package:fare_rate_mm/views/no_network.dart';
+import 'package:fare_rate_mm/views/second_home.dart';
 
 class AuthenticationWrapper extends StatelessWidget {
   const AuthenticationWrapper({Key? key}) : super(key: key);

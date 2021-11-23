@@ -1,5 +1,5 @@
-name: xchange
-#name: fare_rate_mm
+
+name: fare_rate_mm
 description: A new Flutter project.
 
 publish_to: "none"

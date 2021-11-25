@@ -162,6 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: TextFormField(
+                          // initialValue: '+254',
                           controller: phoneNumber,
                           autofocus: true,
                           keyboardType: TextInputType.phone,

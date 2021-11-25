@@ -27,6 +27,7 @@ dependencies:
   intl: ^0.17.0
   connectivity: ^3.0.6
   connectivity_plus: ^2.0.2
+  flag: ^5.0.1
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_keyboard/my_keyboard.dart';
 import 'package:fare_rate_mm/views/profile.dart';
-
+import 'package:flag/flag.dart';
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -25,19 +25,14 @@ class _HomeState extends State<Home> {
   bool isLoading = false;
   String ushName = '';
   String usdName = '';
+  String flagChosen = 'UG';
 
 
-
-  // double kshRate = double.parse(data['Ksh']);
-  // double ushRate = double.parse(data['Ush']);
-  // double usdRate = double.parse(data['Usd']);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // title: Text('Xchange', style: Theme.of(context).textTheme.headline6),
-        // centerTitle: true,
         leading: const Icon(Icons.menu),
         actions: [
           GestureDetector(
@@ -144,11 +139,11 @@ class _HomeState extends State<Home> {
                             sellingDropdownValue = newValue!;
                           });
 
-                          if (sellingDropdownValue == ushName) {
+                          if (sellingDropdownValue == 'ush') {
                             setState(() {
                               rate = double.parse('${data['Ush']}');
                             });
-                          } else if (sellingDropdownValue == usdName) {
+                          } else if (sellingDropdownValue == 'usd') {
                             setState(() {
                               rate = double.parse('${data['Usd']}');
                             });
@@ -158,7 +153,6 @@ class _HomeState extends State<Home> {
                         },
                         items: <String>[
                           // TODO: change to Ush as trrhe first choice
-                          
                           'ush',
                           'usd',
 
@@ -189,15 +183,20 @@ class _HomeState extends State<Home> {
               ),
               Text(
                 sellingDropdownValue=='ush'? ushName:usdName,
+                // '${rate}',
                 style: Theme.of(context).textTheme.headline4?.copyWith(
                       color: isBuying ? Colors.green : Colors.orange,
                     ),
               ),
             ],
           ),
-          // TextFormField(
-          //   decoration:const  InputDecoration(labelText: 'From'),
-          // ),
+          const Spacer(),
+          Flag.fromCode(
+           sellingDropdownValue=='ush'? FlagsCode.UG:FlagsCode.US,
+            height: 60,
+            width: 100,
+            fit: BoxFit.fill,
+          ),
           const Spacer(),
           ElevatedButton.icon(
             icon: isBuying
@@ -205,7 +204,6 @@ class _HomeState extends State<Home> {
                 : const Icon(Icons.arrow_back),
             onPressed: () {
               setState(() {
-                // sellingDropdownValue = rate.toString();
                 isBuying = !isBuying;
               });
             },

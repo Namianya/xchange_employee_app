@@ -51,6 +51,43 @@
           }
         },
         {
+          "client_id": "58814888319-jehbqomqomi959qje4cac4ck1n5kivhq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.namianya.xchange",
+            "certificate_hash": "4fd03ab16c513e2a3aad0ac46b8b15dc7415a2ce"
+          }
+        },
+        {
+          "client_id": "58814888319-aof2d0gv286trvnnb7t3slapkrhnk2rr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWjbPmypks1evpEJAyflDRom1UBdql-GE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "58814888319-aof2d0gv286trvnnb7t3slapkrhnk2rr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58814888319:android:bcbaeea282522cdbd4824a",
+        "android_client_info": {
+          "package_name": "com.wekesa.fareRateEmployee"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "58814888319-aof2d0gv286trvnnb7t3slapkrhnk2rr.apps.googleusercontent.com",
           "client_type": 3
         }

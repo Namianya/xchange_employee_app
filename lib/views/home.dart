@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:my_keyboard/my_keyboard.dart';
 import 'package:fare_rate_mm/views/profile.dart';
 import 'package:flag/flag.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -17,7 +18,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String text = '';
   String buyingDropdownValue = "Ksh";
-  String sellingDropdownValue = "ush";
+  String dropdownValue = "ush";
   double rate = 0;
   double result = 0;
   bool isBuying = true;
@@ -26,8 +27,6 @@ class _HomeState extends State<Home> {
   String ushName = '';
   String usdName = '';
   String flagChosen = 'UG';
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +116,11 @@ class _HomeState extends State<Home> {
                   if (snapshot.connectionState == ConnectionState.active) {
                     Map<String, dynamic> data =
                         snapshot.data!.data() as Map<String, dynamic>;
-                    // sellingDropdownValue = 'USH: ${data['Ush']}';
                     if (data != null) {
                       ushName = 'USH: ${data['Ush']}';
                       usdName = 'USD: ${data['Usd']}';
                       return DropdownButton<String?>(
-                        value: sellingDropdownValue,
+                        value: dropdownValue,
                         icon: Icon(
                           Icons.arrow_drop_down_sharp,
                           color: isBuying ? Colors.green : Colors.orange,
@@ -136,14 +134,14 @@ class _HomeState extends State<Home> {
                         ),
                         onChanged: (String? newValue) {
                           setState(() {
-                            sellingDropdownValue = newValue!;
+                            dropdownValue = newValue!;
                           });
 
-                          if (sellingDropdownValue == 'ush') {
+                          if (dropdownValue == 'ush') {
                             setState(() {
                               rate = double.parse('${data['Ush']}');
                             });
-                          } else if (sellingDropdownValue == 'usd') {
+                          } else if (dropdownValue == 'usd') {
                             setState(() {
                               rate = double.parse('${data['Usd']}');
                             });
@@ -155,7 +153,6 @@ class _HomeState extends State<Home> {
                           // TODO: change to Ush as trrhe first choice
                           'ush',
                           'usd',
-
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -169,7 +166,6 @@ class _HomeState extends State<Home> {
                   return const CircularProgressIndicator();
                 },
               ),
-
             ],
           ),
           Row(
@@ -182,7 +178,7 @@ class _HomeState extends State<Home> {
                     ),
               ),
               Text(
-                sellingDropdownValue=='ush'? ushName:usdName,
+                dropdownValue == 'ush' ? ushName : usdName,
                 // '${rate}',
                 style: Theme.of(context).textTheme.headline4?.copyWith(
                       color: isBuying ? Colors.green : Colors.orange,
@@ -191,11 +187,26 @@ class _HomeState extends State<Home> {
             ],
           ),
           const Spacer(),
-          Flag.fromCode(
-           sellingDropdownValue=='ush'? FlagsCode.UG:FlagsCode.US,
-            height: 60,
-            width: 100,
-            fit: BoxFit.fill,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flag.fromCode(
+                dropdownValue == 'ush' ? FlagsCode.UG : FlagsCode.US,
+                height: 40,
+                width: 70,
+                fit: BoxFit.fill,
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                child: Icon(isBuying ? Icons.arrow_forward : Icons.arrow_back),
+              ),
+              Flag.fromCode(
+                FlagsCode.KE,
+                height: 40,
+                width: 70,
+                fit: BoxFit.fill,
+              ),
+            ],
           ),
           const Spacer(),
           ElevatedButton.icon(
@@ -221,7 +232,7 @@ class _HomeState extends State<Home> {
             height: 25,
           ),
           Text(
-            sellingDropdownValue == rate
+            dropdownValue == rate
                 ? 'Choose a rate'
                 : '${result != 0 ? result : '_ _'} ',
             style: Theme.of(context)
@@ -256,7 +267,7 @@ class _HomeState extends State<Home> {
                 FirebaseFirestore.instance.collection('transactions').add({
                   'number': num,
                   'rate': rate,
-                  'currency': sellingDropdownValue,
+                  'currency': dropdownValue,
                   'isBuying': isBuying,
                   'input': double.parse(text),
                   'result': result,
@@ -264,19 +275,12 @@ class _HomeState extends State<Home> {
                 });
 
                 isLoading = false;
-                // Future.delayed(Duration(seconds: 5)).then((value) {
-                //   setState(() {
-                //     text = '';
-                //     result = 0;
-                //   });
-                // });
               });
             },
             rightButtonFn: () {
               isLoading
                   ? text
                   : setState(() {
-                      // text = text.substring(0, text.length - 1);
                       text = '';
                       result = 0;
                     });

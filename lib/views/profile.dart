@@ -1,5 +1,7 @@
+import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/src/provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -8,7 +10,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
-
+    var currentUserModel = context.watch<Store>().currentUser;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -62,18 +64,13 @@ class ProfilePage extends StatelessWidget {
             style: Theme.of(context).textTheme.headline5,
           ),
           const Spacer(),
-          // ElevatedButton.icon(
-          //   style: ElevatedButton.styleFrom(primary: Colors.red),
-          //   onPressed: () async {
-          //     await FirebaseAuth.instance.signOut();
-          //   },
-          //   icon: const Icon(
-          //     Icons.logout,
-          //     color: Colors.white,
-          //   ),
-          //   label: const Text('Logout'),
-          // ),
+          ElevatedButton.icon(
+            onPressed: () {},
+            icon: Icon(Icons.logout),
+            label: Text('Logout'),
+          ),
         ],
+
       ),
     );
   }

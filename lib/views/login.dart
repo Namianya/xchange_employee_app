@@ -77,8 +77,8 @@ class _LoginPageState extends State<LoginPage> {
               )
               .then((value) => print("data merged with existing data"))
               .catchError((error) => print('Failed to merge: $error'));
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => const Home()));
+          // Navigator.push(
+          //     context, MaterialPageRoute(builder: (context) => const Home()));
         }
       } on FirebaseAuthException catch (e) {
         setState(() {
@@ -114,14 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     isLoading = false;
                   });
-                  // signInWithPhoneAuthCredential(credential);
-                  // FirebaseFirestore.instance.collection('transactions').add({
-                  //   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
-                  //   'time': FieldValue.serverTimestamp()
-                  // });
                 },
                 verificationFailed: (FirebaseAuthException e) async {
-                  // _scaffoldKey.currentState!.showSnackBar(snackbar);
                   setState(() {
                     isLoading = false;
                   });

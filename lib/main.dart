@@ -1,4 +1,3 @@
-
 import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:fare_rate_mm/services/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,10 +34,10 @@ class MyApp extends StatelessWidget {
           initialData: ConnectivityStatus.Offline,
           value: ConnectivityService().connectionStatusController.stream,
         ),
-        // StreamProvider(
-        //   create: (context) => context.read<Store>().currentUser,
-        //   initialData: null,
-        // ),
+        StreamProvider(
+          create: (context) => context.read<Store>().currentUser,
+          initialData: null,
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

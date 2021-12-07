@@ -39,7 +39,7 @@ class Store {
           name: e.get('name'),
           phoneNumber: e.get('number'),
           isActivated: e.get('isActivated'),
-          createdOn: e.get('createdOn'),  
+          createdOn: e.get('time'),
         ));
   }
 }

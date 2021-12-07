@@ -1,14 +1,18 @@
 import 'package:fare_rate_mm/services/data_store.dart';
+import 'package:fare_rate_mm/services/riverpod_providers.dart';
+import 'package:fare_rate_mm/services/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Size size = MediaQuery.of(context).size;
     String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
+    final currentUser = ref.watch(currentUserData);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -17,58 +21,49 @@ class ProfilePage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Hero(
-            tag: 'avatar',
-            child: CircleAvatar(
-              backgroundColor: Colors.grey[100],
-              child: const FlutterLogo(
-                size: 100,
+      body: Center(
+        child: currentUser.when(
+          data: (data) => Column(
+            children: [
+              Hero(
+                  tag: 'avatar',
+                  child: CircleAvatar(
+                    child: Icon(Icons.person),
+                    radius: MediaQuery.of(context).size.width * 0.2,
+                  )),
+              const SizedBox(
+                height: 30,
               ),
-              radius: size.width * 0.3,
-            ),
+              _userTextInfo(
+                context,
+                data.phoneNumber,
+                'Phone Number',
+              ),
+              _userTextInfo(
+                context,
+                data.name,
+                'Name',
+              ),
+            ],
           ),
-          const SizedBox(
-            height: 50,
-          ),
-          const Divider(),
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            'Number',
-            style: Theme.of(context).textTheme.subtitle1,
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            '$num',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Text(
-            'Level',
-            style: Theme.of(context).textTheme.subtitle1,
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          Text(
-            'Employee',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          const Spacer(),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.logout),
-            label: Text('Logout'),
+          error: (e, s) => Text('$e'),
+          loading: () => Center(child: const CircularProgressIndicator()),
+        ),
+      ),
+    );
+  }
+
+  RichText _userTextInfo(BuildContext context, dynamic data, String title) {
+    return RichText(
+      text: TextSpan(
+        text: title + ': ',
+        style: Theme.of(context).textTheme.bodyText1,
+        children: [
+          TextSpan(
+            text: '  ${data}',
+            style: Theme.of(context).textTheme.headline6,
           ),
         ],
-
       ),
     );
   }

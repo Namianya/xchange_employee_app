@@ -128,17 +128,34 @@ class AppKeyboard extends ConsumerWidget {
                       data: (data) => InkWell(
                             splashColor: Colors.green[900],
                             borderRadius: BorderRadius.circular(5),
-                            onTap: () => _dropdownProvider.dropDownValue == 'US'
-                                ? _inputTextChangeNotifire.calculateBuyingText(
-                                    _dropdownProvider.dropDownValue == 'UG'
-                                        ? data.ush
-                                        : data.usd,
-                                  )
-                                : _inputTextChangeNotifire.calculateSellingText(
-                                    _dropdownProvider.dropDownValue == 'UG'
-                                        ? data.ush
-                                        : data.usd,
-                                  ),
+                            onTap: _inputTextChangeNotifire.inputText != null
+                                ? () => {
+                                      _dropdownProvider.dropDownValue == 'US'
+                                          ? _inputTextChangeNotifire
+                                              .calculateBuyingText(
+                                              _dropdownProvider.dropDownValue ==
+                                                      'UG'
+                                                  ? data.ush
+                                                  : data.usd,
+                                            )
+                                          : _inputTextChangeNotifire
+                                              .calculateSellingText(
+                                              _dropdownProvider.dropDownValue ==
+                                                      'UG'
+                                                  ? data.ush
+                                                  : data.usd,
+                                            ),
+                                    }
+                                : () =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        duration: Duration(seconds: 1),
+                                        content: Text(
+                                          'Please enter a value',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
@@ -163,17 +180,34 @@ class AppKeyboard extends ConsumerWidget {
                       data: (data) => InkWell(
                             splashColor: Colors.green[900],
                             borderRadius: BorderRadius.circular(5),
-                            onTap: () => _dropdownProvider.dropDownValue == 'US'
-                                ? _inputTextChangeNotifire.calculateSellingText(
-                                    _dropdownProvider.dropDownValue == 'UG'
-                                        ? data.ush
-                                        : data.usd,
-                                  )
-                                : _inputTextChangeNotifire.calculateBuyingText(
-                                    _dropdownProvider.dropDownValue == 'UG'
-                                        ? data.ush
-                                        : data.usd,
-                                  ),
+                            onTap: _inputTextChangeNotifire.inputText != null
+                                ? () => {
+                                      _dropdownProvider.dropDownValue == 'US'
+                                          ? _inputTextChangeNotifire
+                                              .calculateSellingText(
+                                              _dropdownProvider.dropDownValue ==
+                                                      'UG'
+                                                  ? data.ush
+                                                  : data.usd,
+                                            )
+                                          : _inputTextChangeNotifire
+                                              .calculateBuyingText(
+                                              _dropdownProvider.dropDownValue ==
+                                                      'UG'
+                                                  ? data.ush
+                                                  : data.usd,
+                                            ),
+                                    }
+                                : () =>
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        duration: Duration(seconds: 1),
+                                        content: Text(
+                                          'Please enter a value',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(

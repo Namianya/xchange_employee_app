@@ -193,9 +193,9 @@ class SecondHome extends ConsumerWidget {
                           : Colors.grey,
                     )),
             Text(
-              '${_inputTextChangeNotifire.inputText != "" ? _inputTextChangeNotifire.inputText : "Enter Amount"}',
+              '${_inputTextChangeNotifire.inputText ?? "Enter Amount"}',
               style: Theme.of(context).textTheme.headline5?.copyWith(
-                    color: _inputTextChangeNotifire.inputText != ""
+                    color: _inputTextChangeNotifire.inputText != null
                         ? Colors.black
                         : Colors.grey,
                   ),

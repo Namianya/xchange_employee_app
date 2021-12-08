@@ -19,6 +19,9 @@ class Store {
   final DocumentReference stockDocumentRef = FirebaseFirestore.instance
       .collection('assignedStock')
       .doc(FirebaseAuth.instance.currentUser!.phoneNumber);
+  CollectionReference transationCollection =
+      FirebaseFirestore.instance.collection('transaction');
+
 
   Stream<UserModel> get currentUser {
     return userDocument.snapshots().map((e) => UserModel(
@@ -46,6 +49,8 @@ class Store {
           usd: e.get('Usd'),
         ));
   }
+
+  
 
   Stream<StockModel> get currentStock {
     return stockDocumentRef.snapshots().map((e) => StockModel(

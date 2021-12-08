@@ -1,38 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fare_rate_mm/services/rate.dart';
-import 'package:fare_rate_mm/services/user_model.dart';
+import 'package:fare_rate_mm/models/rate.dart';
+import 'package:fare_rate_mm/models/stock_model.dart';
+import 'package:fare_rate_mm/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Store {
-  String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
   DocumentReference userDocument = FirebaseFirestore.instance
       .collection('user')
       .doc(FirebaseAuth.instance.currentUser!.phoneNumber);
   CollectionReference buyingRateCollection =
       FirebaseFirestore.instance.collection('buyingRate');
-  final Stream<QuerySnapshot> buyingRatelast = FirebaseFirestore.instance
+  final DocumentReference buyingRatelast = FirebaseFirestore.instance
       .collection('buyingRate')
-      .orderBy(
-        'createdOn',
-        descending: true,
-      )
-      .limit(1)
-      .snapshots();
-
-  List<Rate> _buyingListFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.docs
-        .map((e) => Rate(
-              ksh: e.get('Ksh'),
-              ush: e.get('Ush'),
-              usd: e.get('Usd'),
-              time: 'createdOn',
-            ))
-        .toList();
-  }
-
-  Stream<List<Rate>> get rate {
-    return buyingRateCollection.snapshots().map(_buyingListFromSnapshot);
-  }
+      .doc('6PKMVxXXAvwAxhdcDZsr');
+  final DocumentReference sellingRatelast = FirebaseFirestore.instance
+      .collection('sellingRate')
+      .doc('dLLxgZBJkAayNKDqLOMX');
+  final DocumentReference stockDocumentRef = FirebaseFirestore.instance
+      .collection('assignedStock')
+      .doc(FirebaseAuth.instance.currentUser!.phoneNumber);
 
   Stream<UserModel> get currentUser {
     return userDocument.snapshots().map((e) => UserModel(
@@ -40,6 +26,33 @@ class Store {
           phoneNumber: e.get('number'),
           isActivated: e.get('isActivated'),
           createdOn: e.get('time'),
+        ));
+  }
+
+  Stream<Rate> get currentBuyingRate {
+    return buyingRatelast.snapshots().map((e) => Rate(
+          ksh: e.get('Ksh'),
+          ush: e.get('Ush'),
+          time: e.get('createdOn'),
+          usd: e.get('Usd'),
+        ));
+  }
+
+  Stream<Rate> get currentSellingRate {
+    return sellingRatelast.snapshots().map((e) => Rate(
+          ksh: e.get('Ksh'),
+          ush: e.get('Ush'),
+          time: e.get('createdOn'),
+          usd: e.get('Usd'),
+        ));
+  }
+
+  Stream<StockModel> get currentStock {
+    return stockDocumentRef.snapshots().map((e) => StockModel(
+          ksh: e.get('ksh'),
+          createdOn: e.get('createdOn'),
+          usd: e.get('usd'),
+          ush: e.get('ush'),
         ));
   }
 }

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fare_rate_mm/network/connectivity_service.dart';
-import 'package:fare_rate_mm/services/riverpod_providers.dart';
+import 'package:fare_rate_mm/logic/riverpod_providers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,8 +24,8 @@ class AuthenticationWrapper extends ConsumerWidget {
     } else {
       if (firebaseUser != null) {
         print(currentconnectionStatus.value);
-        return const Home();
-        // return SecondHome();
+        // return const Home();
+        return SecondHome();
       }
       return const LoginPage();
     }

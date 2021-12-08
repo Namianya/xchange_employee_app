@@ -4,7 +4,7 @@ class Rate {
   final String ksh;
   final String ush;
   final String usd;
-  final String time;
+  final Timestamp time;
 
   Rate({
     required this.time,
@@ -15,10 +15,10 @@ class Rate {
 
   static Rate fromSnapshot(DocumentSnapshot snap) {
     Rate rate = Rate(
-        time: snap['createdOn'],
-        ksh: snap['Ksh'],
-        ush: snap['Ush'],
-        usd: snap['Usd']);
+        time: snap['createdOn']??Timestamp.now(),
+        ksh: snap['Ksh']??'0',
+        ush: snap['Ush']??'0',
+        usd: snap['Usd']??'0');
     return rate;
   }
 }

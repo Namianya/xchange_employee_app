@@ -18,16 +18,18 @@ class AuthenticationWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final firebaseUser = ref.watch(authChange);
     var currentconnectionStatus = ref.watch(connectivityStatus);
-    if (currentconnectionStatus.value == null) {
-      print('Connection Status: Offline');
-      return const NoNetwork();
-    } else {
-      if (firebaseUser != null) {
-        print(currentconnectionStatus.value);
-        // return const Home();
-        return SecondHome();
-      }
-      return const LoginPage();
-    }
+    return currentconnectionStatus.when(
+        data: (dat) => currentconnectionStatus.value == null
+            ? const NoNetwork()
+            : firebaseUser.when(
+                data: (data) => data?.uid != null ? SecondHome() : LoginPage(),
+                error: (e, s) => Center(
+                      child: Text('Login'),
+                    ),
+                loading: () => const CircularProgressIndicator()),
+        error: (e, s) => Center(
+              child: Text('Login'),
+            ),
+        loading: () => const CircularProgressIndicator());
   }
 }

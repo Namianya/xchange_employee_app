@@ -1,15 +1,16 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TransactionModel {
-  String? userNumber;
+  String? userNumber = FirebaseAuth.instance.currentUser!.phoneNumber;
   double rate;
   bool isBuying;
   String currency;
   double initialValue;
   double finalValue;
-  Timestamp transactionTime;
+  FieldValue transactionTime;
 
   TransactionModel({
     this.userNumber,

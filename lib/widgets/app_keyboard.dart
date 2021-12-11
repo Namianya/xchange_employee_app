@@ -1,8 +1,12 @@
 library my_keyboard;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fare_rate_mm/logic/dropdown_provider.dart';
+import 'package:fare_rate_mm/logic/loading_change_provider.dart';
 import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
+import 'package:fare_rate_mm/models/tranasction_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,6 +51,7 @@ class AppKeyboard extends ConsumerWidget {
     final _currentBuyingRate = ref.watch(buyingRateData);
     final _currentSellingRate = ref.watch(sellingRateData);
     final _dropdownProvider = ref.watch(dropDownChangeNotifire);
+    final _isLoadingProvider = ref.watch(isLoadingChangeProvider);
 
     Widget _calcButton(String value, BuildContext context) {
       return InkWell(
@@ -145,6 +150,33 @@ class AppKeyboard extends ConsumerWidget {
                                                   ? data.ush
                                                   : data.usd,
                                             ),
+                                      _isLoadingProvider.changeLoadingState(),
+                                      FirebaseFirestore.instance
+                                          .collection('transactions')
+                                          .add(
+                                            TransactionModel(
+                                                    userNumber: FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .phoneNumber,
+                                                    currency: _dropdownProvider
+                                                        .dropDownValue,
+                                                    finalValue:
+                                                        _inputTextChangeNotifire
+                                                            .calculatedText,
+                                                    initialValue: double.parse(
+                                                        _inputTextChangeNotifire
+                                                            .inputText!),
+                                                    isBuying: _isByBuyingState
+                                                        .isBuying,
+                                                    rate:
+                                                        _inputTextChangeNotifire
+                                                            .currentRate!,
+                                                    transactionTime: FieldValue
+                                                        .serverTimestamp())
+                                                .toMap(),
+                                          ),
+                                      _isLoadingProvider.changeLoadingState(),
                                     }
                                 : () =>
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -164,14 +196,16 @@ class AppKeyboard extends ConsumerWidget {
                               ),
                               width: size.width * 0.4,
                               height: 60,
-                              child: Text(
-                                'CALCULATE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: _isLoadingProvider.isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(
+                                      'CALCULATE',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
                       error: (e, s) => Text('$e'),
@@ -197,6 +231,33 @@ class AppKeyboard extends ConsumerWidget {
                                                   ? data.ush
                                                   : data.usd,
                                             ),
+                                      _isLoadingProvider.changeLoadingState(),
+                                      FirebaseFirestore.instance
+                                          .collection('transactions')
+                                          .add(
+                                            TransactionModel(
+                                                    userNumber: FirebaseAuth
+                                                        .instance
+                                                        .currentUser!
+                                                        .phoneNumber,
+                                                    currency: _dropdownProvider
+                                                        .dropDownValue,
+                                                    finalValue:
+                                                        _inputTextChangeNotifire
+                                                            .calculatedText,
+                                                    initialValue: double.parse(
+                                                        _inputTextChangeNotifire
+                                                            .inputText!),
+                                                    isBuying: _isByBuyingState
+                                                        .isBuying,
+                                                    rate:
+                                                        _inputTextChangeNotifire
+                                                            .currentRate!,
+                                                    transactionTime: FieldValue
+                                                        .serverTimestamp())
+                                                .toMap(),
+                                          ),
+                                      _isLoadingProvider.changeLoadingState(),
                                     }
                                 : () =>
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -216,14 +277,16 @@ class AppKeyboard extends ConsumerWidget {
                               ),
                               width: size.width * 0.4,
                               height: 60,
-                              child: Text(
-                                'CALCULATE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: _isLoadingProvider.isLoading
+                                  ? const CircularProgressIndicator()
+                                  : Text(
+                                      'CALCULATE',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
                       error: (e, s) => Text('$e'),

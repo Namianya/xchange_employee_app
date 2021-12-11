@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fare_rate_mm/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
@@ -53,12 +54,22 @@ class _LoginPageState extends State<LoginPage> {
               .collection('user')
               .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
               .set(
-                {
-                  'number': FirebaseAuth.instance.currentUser!.phoneNumber,
-                  'name': firstName.text,
-                  'isActivated': false,
-                  'time': FieldValue.serverTimestamp()
-                },
+                UserModel(
+                  phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber!,
+                  userName: firstName.text,
+                  isActivated: false,
+                  kenyaShop: true,
+                  isDayShift: true,
+                  createdOn: FieldValue.serverTimestamp(),
+                ).toMap(),
+                // {
+                //   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
+                //   'name': firstName.text,
+                //   'isActivated': false,
+                //   'kenyaShop':true,
+                //   'isDayS'
+                //   'time': FieldValue.serverTimestamp()
+                // },
                 SetOptions(merge: true),
               )
               .then((value) => print("data merged with existing data"))

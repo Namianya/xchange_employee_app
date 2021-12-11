@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
-class AuthService {
+class AuthService extends ChangeNotifier {
   final FirebaseAuth _firebaseAuth;
   AuthService(this._firebaseAuth);
   Future<String?> signIn({required String phoneNumber}) async {
@@ -25,5 +26,6 @@ class AuthService {
   // }
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
+  
   
 }

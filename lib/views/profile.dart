@@ -2,6 +2,7 @@ import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
 import 'package:fare_rate_mm/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,13 +36,34 @@ class ProfilePage extends ConsumerWidget {
               const SizedBox(
                 height: 30,
               ),
-              _infoTile(size: size, data: data.name, context: context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Shop:'),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Flag.fromString(
+                    data.kenyaShop! ? 'KE' : 'UG',
+                    height: 20,
+                    width: 30,
+                    fit: BoxFit.fill,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              _infoTile(size: size, data: data.userName, context: context),
               const SizedBox(
                 height: 10,
               ),
               _infoTile(size: size, data: data.phoneNumber, context: context),
               const SizedBox(
                 height: 40,
+              ),
+              const SizedBox(
+                height: 10,
               ),
               Text(
                 'My Assigned Stock',

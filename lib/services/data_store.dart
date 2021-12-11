@@ -22,14 +22,10 @@ class Store {
   CollectionReference transationCollection =
       FirebaseFirestore.instance.collection('transaction');
 
-
   Stream<UserModel> get currentUser {
-    return userDocument.snapshots().map((e) => UserModel(
-          name: e.get('name'),
-          phoneNumber: e.get('number'),
-          isActivated: e.get('isActivated'),
-          createdOn: e.get('time'),
-        ));
+    return userDocument.snapshots().map((snapshot) {
+      return UserModel.fromSnapshot(snapshot);
+    });
   }
 
   Stream<Rate> get currentBuyingRate {
@@ -49,8 +45,6 @@ class Store {
           usd: e.get('Usd'),
         ));
   }
-
-  
 
   Stream<StockModel> get currentStock {
     return stockDocumentRef.snapshots().map((e) => StockModel(

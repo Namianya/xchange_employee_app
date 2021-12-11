@@ -20,6 +20,8 @@ final connectivityStatus = StreamProvider<ConnectivityStatus>((ref) {
   return ConnectivityService().connectionStatusController.stream;
 });
 
+// final connectionState =
+//     Provider<bool>((ref) => ref.watch(connectivityStatus).value);
 // Change notifires providers
 
 class IsBuyingChangeNotifier extends ChangeNotifier {
@@ -53,4 +55,4 @@ final buyingRateData = StreamProvider<Rate>((ref) => Store().currentBuyingRate);
 final sellingRateData =
     StreamProvider<Rate>((ref) => Store().currentSellingRate);
 
-final stockStream= StreamProvider<StockModel>((ref) => Store().currentStock);
+final stockStream = StreamProvider<StockModel>((ref) => Store().currentStock);

@@ -3,11 +3,12 @@ import 'package:connectivity/connectivity.dart';
 import 'package:fare_rate_mm/network/connectivity_status.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ConnectivityService extends ChangeNotifier {
+class ConnectivityService extends StateNotifier<ConnectivityStatus> {
   StreamController<ConnectivityStatus> connectionStatusController =
       StreamController<ConnectivityStatus>();
-  ConnectivityService() {
+  ConnectivityService() : super(ConnectivityStatus.LoadingConnection) {
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       connectionStatusController.add(getStatusFromResult(result));
     });

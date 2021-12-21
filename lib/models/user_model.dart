@@ -33,7 +33,7 @@ class UserModel {
   factory UserModel.fromSnapshot(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
     return UserModel(
-      phoneNumber: data['phoneNumber'] ?? '123456789',
+      phoneNumber: data['number'] ?? '123456789',
       isDayShift: data['isDayShift'] ?? true,
       userName: data['userName'] ?? 'Username',
       isActivated: data['isActivated'] ?? false,

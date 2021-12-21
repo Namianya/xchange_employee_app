@@ -186,12 +186,39 @@ class SecondHome extends ConsumerWidget {
               ],
             ),
             const Spacer(),
-            Text('${_inputTextChangeNotifire.calculatedText}',
-                style: Theme.of(context).textTheme.headline3?.copyWith(
-                      color: _inputTextChangeNotifire.inputText != ""
-                          ? Colors.black
-                          : Colors.grey,
-                    )),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${_inputTextChangeNotifire.calculatedText}',
+                  style: Theme.of(context).textTheme.headline3?.copyWith(
+                        color: _inputTextChangeNotifire.inputText != ""
+                            ? Colors.black
+                            : Colors.grey,
+                      ),
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                _isByBuyingState.isBuying
+                    ? Text(
+                        _dropdownProvider.dropDownValue == 'US' ? 'USD' : 'USH',
+                        style: Theme.of(context).textTheme.headline5?.copyWith(
+                              color: _inputTextChangeNotifire.inputText != ""
+                                  ? Colors.black
+                                  : Colors.grey,
+                            ),
+                      )
+                    : Text(
+                        'KSH',
+                        style: Theme.of(context).textTheme.headline5?.copyWith(
+                              color: _inputTextChangeNotifire.inputText != ""
+                                  ? Colors.black
+                                  : Colors.grey,
+                            ),
+                      )
+              ],
+            ),
             Text(
               '${_inputTextChangeNotifire.inputText ?? "Enter Amount"}',
               style: Theme.of(context).textTheme.headline5?.copyWith(

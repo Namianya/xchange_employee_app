@@ -1,6 +1,4 @@
-// import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
-// import 'package:fare_rate_mm/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +10,7 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Size size = MediaQuery.of(context).size;
-    // String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
-    final currentUser = ref.watch(currentUserData);
+    final _currentUser = ref.watch(currentUserData);
     final _stockModel = ref.watch(stockStream);
     return Scaffold(
       appBar: AppBar(
@@ -24,7 +21,7 @@ class ProfilePage extends ConsumerWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: currentUser.when(
+        child: _currentUser.when(
           data: (data) => Column(
             children: [
               Hero(

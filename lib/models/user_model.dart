@@ -8,7 +8,7 @@ class UserModel {
   final bool isActivated;
   bool? isDayShift = true;
   bool? kenyaShop = true;
-  final FieldValue? createdOn;
+  final Timestamp? createdOn;
 
   UserModel({
     this.isDayShift,
@@ -24,21 +24,21 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'userName': userName,
       'isActivated': isActivated,
-      'createdOn': createdOn,
       'isDayShift': isDayShift,
       'kenyaShop': kenyaShop,
+      'createdOn': createdOn,
     };
   }
 
   factory UserModel.fromSnapshot(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
     return UserModel(
-      phoneNumber: data['number'] ?? '123456789',
-      isDayShift: data['isDayShift'] ?? true,
-      userName: data['userName'] ?? 'Username',
-      isActivated: data['isActivated'] ?? false,
-      kenyaShop: data['kenyaShop'] ?? true,
-      createdOn: data['createdOn'] ?? null,
+      
+      userName: doc['userName'] ?? '',
+      isActivated: doc['isActivated'] ?? false,
+      phoneNumber: doc['number'] ?? '',
+      isDayShift: doc['isDayShift'],
+      kenyaShop: doc['kenyaShop'],
+      createdOn: doc['createdOn'] as Timestamp,
     );
   }
 

@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fare_rate_mm/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-import 'package:fare_rate_mm/views/home.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 enum MobileVerificationState {
   SHOW_MOBILE_FORM_STATE,
@@ -34,9 +32,16 @@ class _LoginPageState extends State<LoginPage> {
   );
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController firstName = TextEditingController();
+  CollectionReference _userCollection =
+      FirebaseFirestore.instance.collection('user');
   final _formKey = GlobalKey<FormState>();
+
+  String initialCountry = 'KE';
+  PhoneNumber number = PhoneNumber(isoCode: 'KE');
+
   @override
   Widget build(BuildContext context) {
+    print(number.dialCode);
     void signInWithPhoneAuthCredential(
         PhoneAuthCredential phoneAuthCredential) async {
       setState(() {
@@ -46,51 +51,7 @@ class _LoginPageState extends State<LoginPage> {
         final authCredential = await FirebaseAuth.instance.signInWithCredential(
           phoneAuthCredential,
         );
-        // setState(() {
-        //   isLoading = false;
-        // });
-        if (authCredential.user != null) {
-          FirebaseFirestore.instance
-              .collection('user')
-              .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
-              .set(
-                UserModel(
-                  phoneNumber: FirebaseAuth.instance.currentUser!.phoneNumber!,
-                  userName: firstName.text,
-                  isActivated: false,
-                  kenyaShop: true,
-                  isDayShift: true,
-                  createdOn: FieldValue.serverTimestamp(),
-                ).toMap(),
-                // {
-                //   'number': FirebaseAuth.instance.currentUser!.phoneNumber,
-                //   'name': firstName.text,
-                //   'isActivated': false,
-                //   'kenyaShop':true,
-                //   'isDayS'
-                //   'time': FieldValue.serverTimestamp()
-                // },
-                SetOptions(merge: true),
-              )
-              .then((value) => print("data merged with existing data"))
-              .catchError((error) => print('Failed to merge: $error'));
-          FirebaseFirestore.instance
-              .collection('assignedStock')
-              .doc(FirebaseAuth.instance.currentUser!.phoneNumber)
-              .set(
-                {
-                  'ksh': 0,
-                  'usd': 0,
-                  'ush': 0,
-                  'createdOn': FieldValue.serverTimestamp()
-                },
-                SetOptions(merge: true),
-              )
-              .then((value) => print("data merged with existing data"))
-              .catchError((error) => print('Failed to merge: $error'));
-          // Navigator.push(
-          //     context, MaterialPageRoute(builder: (context) => const Home()));
-        }
+        if (authCredential.user != null) {}
       } on FirebaseAuthException catch (e) {
         setState(() {
           isLoading = false;
@@ -111,39 +72,55 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
           onPressed: () async {
-            if (_formKey.currentState!.validate()) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('saving data ')),
-              );
-              setState(() {
-                isLoading = true;
-              });
+            // getPhoneNumber();
 
-              await FirebaseAuth.instance.verifyPhoneNumber(
-                phoneNumber: phoneNumber.text,
-                verificationCompleted: (PhoneAuthCredential credential) async {
-                  setState(() {
-                    isLoading = false;
-                  });
-                },
-                verificationFailed: (FirebaseAuthException e) async {
-                  setState(() {
-                    isLoading = false;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text(
-                    'error: ${e.message}',
-                    style: Theme.of(context).textTheme.bodyText1,
-                  )));
-                },
-                codeSent: (String verificationId, int? resendToken) async {
-                  setState(() {
-                    isLoading = false;
-                    currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
-                    this.verificationId = verificationId;
-                  });
-                },
-                codeAutoRetrievalTimeout: (String verificationId) async {},
+            _formKey.currentState?.validate();
+            var doc = await _userCollection
+                .doc(number.dialCode! + phoneNumber.text)
+                .get();
+            if (doc.exists) {
+              if (_formKey.currentState!.validate()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('saving data ')),
+                );
+                setState(() {
+                  isLoading = true;
+                });
+
+                await FirebaseAuth.instance.verifyPhoneNumber(
+                  phoneNumber: number.dialCode! + phoneNumber.text,
+                  verificationCompleted:
+                      (PhoneAuthCredential credential) async {
+                    setState(() {
+                      isLoading = false;
+                    });
+                  },
+                  verificationFailed: (FirebaseAuthException e) async {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                      'error: ${e.message}',
+                      style: Theme.of(context).textTheme.bodyText1,
+                    )));
+                  },
+                  codeSent: (String verificationId, int? resendToken) async {
+                    setState(() {
+                      isLoading = false;
+                      currentState =
+                          MobileVerificationState.SHOW_OTP_FORM_STATE;
+                      this.verificationId = verificationId;
+                    });
+                  },
+                  codeAutoRetrievalTimeout: (String verificationId) async {},
+                );
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('User not found Contact admin'),
+                ),
               );
             }
           }),
@@ -164,47 +141,87 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Padding(
+                      //   padding: const EdgeInsets.all(16.0),
+                      //   child: TextFormField(
+                      //     // initialValue: '+254',
+                      //     controller: phoneNumber,
+                      //     autofocus: true,
+                      //     keyboardType: TextInputType.phone,
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return 'Please enter some text';
+                      //       }
+                      //       return null;
+                      //     },
+                      //     decoration: InputDecoration(
+                      //         focusColor: Theme.of(context).primaryColor,
+                      //         border: const OutlineInputBorder(),
+                      //         label: const Text('Phone Number'),
+                      //         icon: const Icon(Icons.phone)),
+                      //   ),
+                      // ),
+
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: TextFormField(
-                          // initialValue: '+254',
-                          controller: phoneNumber,
-                          autofocus: true,
-                          keyboardType: TextInputType.phone,
+                        padding: const EdgeInsets.all(10.0),
+                        child: InternationalPhoneNumberInput(
+                          onInputChanged: (phone) {
+                            number = phone;
+                          },
+                          locale: 'en_KE',
+                          selectorConfig: SelectorConfig(
+                            selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                          ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
                             }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                              focusColor: Theme.of(context).primaryColor,
-                              border: const OutlineInputBorder(),
-                              label: const Text('Phone Number'),
-                              icon: const Icon(Icons.phone)),
-                        ),
-                      ),
-                      const Text('Start with country code eg +254 7******'),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: TextFormField(
-                          controller: firstName,
-                          autofocus: true,
-                          keyboardType: TextInputType.name,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
+                            if (number.dialCode == '+254' && value[0] == '0') {
+                              return 'Omit the leading zero for Kenyan numbers';
                             }
+                            if (value.length < 9) {
+                              return 'Invalid phone number';
+                            }
+
                             return null;
                           },
-                          decoration: InputDecoration(
-                              focusColor: Theme.of(context).primaryColor,
-                              border: const OutlineInputBorder(),
-                              label: const Text('First Name'),
-                              icon: const Icon(Icons.person)),
+                          onInputValidated: (value) => print(value),
+                          inputBorder: OutlineInputBorder(),
+                          initialValue: number,
+                          autoFocus: true,
+                          hintText: 'Enter phone number',
+                          ignoreBlank: false,
+                          autoValidateMode: AutovalidateMode.onUserInteraction,
+                          selectorTextStyle: TextStyle(color: Colors.black),
+                          textFieldController: phoneNumber,
+                          formatInput: false,
+                          onSaved: (PhoneNumber number) {
+                            print('On Saved: $number');
+                          },
+                          keyboardType: TextInputType.numberWithOptions(
+                              signed: true, decimal: true),
                         ),
                       ),
-                      const Text('Enter your first name')
+                      // Padding(
+                      //   padding: const EdgeInsets.all(16.0),
+                      //   child: TextFormField(
+                      //     controller: firstName,
+                      //     autofocus: true,
+                      //     keyboardType: TextInputType.name,
+                      //     validator: (value) {
+                      //       if (value == null || value.isEmpty) {
+                      //         return 'Please enter some text';
+                      //       }
+                      //       return null;
+                      //     },
+                      //     decoration: InputDecoration(
+                      //         focusColor: Theme.of(context).primaryColor,
+                      //         border: const OutlineInputBorder(),
+                      //         label: const Text('First Name'),
+                      //         icon: const Icon(Icons.person)),
+                      //   ),
+                      // ),
+                      // const Text('Enter your first name')
                     ],
                   ),
                 )
@@ -247,5 +264,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
     );
+  }
+
+  void getPhoneNumber(String phoneNumber) async {
+    setState(() {
+      this.number = number;
+    });
+    print(number);
   }
 }

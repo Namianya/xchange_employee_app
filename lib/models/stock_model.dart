@@ -17,23 +17,23 @@ class StockModel {
   Map<String, dynamic> toMap() {
     return {
       'createdOn': createdOn,
-      'ksh': ksh,
-      'usd': usd,
-      'ush': ush,
+      'ksh': ksh.toDouble(),
+      'usd': usd.toDouble(),
+      'ush': ush.toDouble(),
     };
   }
 
-  factory StockModel.fromMap(DocumentSnapshot doc) {
+  factory StockModel.fromSnapshot(DocumentSnapshot doc) {
     return StockModel(
       createdOn: doc['createdOn'] as Timestamp,
-      ksh: doc['ksh'],
-      usd: doc['usd'],
-      ush: doc['ush'],
+      ksh: doc['ksh'].toDouble() ?? 0,
+      usd: doc['usd'].toDouble() ?? 0,
+      ush: doc['ush'].toDouble() ?? 0,
     );
   }
 
   String toJson() => json.encode(toMap());
 
   factory StockModel.fromJson(String source) =>
-      StockModel.fromMap(json.decode(source));
+      StockModel.fromSnapshot(json.decode(source));
 }

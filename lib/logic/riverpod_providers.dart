@@ -19,11 +19,9 @@ final authChange = StreamProvider<User?>((authService) {
 final connectivityStatus = StreamProvider<ConnectivityStatus>((ref) {
   return ConnectivityService().connectionStatusController.stream;
 });
-
-// final connectionState =
-//     Provider<bool>((ref) => ref.watch(connectivityStatus).value);
-// Change notifires providers
-
+final settingsStreamProvider = StreamProvider((ref) {
+  return Store().settingsStream;
+});
 class IsBuyingChangeNotifier extends ChangeNotifier {
   bool isBuying = true;
 

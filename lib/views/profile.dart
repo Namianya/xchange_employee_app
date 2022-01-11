@@ -112,6 +112,7 @@ class ProfilePage extends ConsumerWidget {
               ElevatedButton.icon(
                 onPressed: () async {
                   await FirebaseAuth.instance.signOut();
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Colors.red,

@@ -25,7 +25,7 @@ class StockModel {
 
   factory StockModel.fromSnapshot(DocumentSnapshot doc) {
     return StockModel(
-      createdOn: doc['createdOn'] as Timestamp,
+      createdOn: doc['createdOn'] ?? Timestamp.now(),
       ksh: doc['ksh'].toDouble() ?? 0,
       usd: doc['usd'].toDouble() ?? 0,
       ush: doc['ush'].toDouble() ?? 0,

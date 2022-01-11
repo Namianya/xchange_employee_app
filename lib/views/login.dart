@@ -72,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ),
           onPressed: () async {
-            // getPhoneNumber();
 
             _formKey.currentState?.validate();
             var doc = await _userCollection
@@ -81,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
             if (doc.exists) {
               if (_formKey.currentState!.validate()) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('saving data ')),
+                  const SnackBar(content: Text('Authenticating...')),
                 );
                 setState(() {
                   isLoading = true;
@@ -141,26 +140,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Padding(
-                      //   padding: const EdgeInsets.all(16.0),
-                      //   child: TextFormField(
-                      //     // initialValue: '+254',
-                      //     controller: phoneNumber,
-                      //     autofocus: true,
-                      //     keyboardType: TextInputType.phone,
-                      //     validator: (value) {
-                      //       if (value == null || value.isEmpty) {
-                      //         return 'Please enter some text';
-                      //       }
-                      //       return null;
-                      //     },
-                      //     decoration: InputDecoration(
-                      //         focusColor: Theme.of(context).primaryColor,
-                      //         border: const OutlineInputBorder(),
-                      //         label: const Text('Phone Number'),
-                      //         icon: const Icon(Icons.phone)),
-                      //   ),
-                      // ),
 
                       Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -202,26 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                               signed: true, decimal: true),
                         ),
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(16.0),
-                      //   child: TextFormField(
-                      //     controller: firstName,
-                      //     autofocus: true,
-                      //     keyboardType: TextInputType.name,
-                      //     validator: (value) {
-                      //       if (value == null || value.isEmpty) {
-                      //         return 'Please enter some text';
-                      //       }
-                      //       return null;
-                      //     },
-                      //     decoration: InputDecoration(
-                      //         focusColor: Theme.of(context).primaryColor,
-                      //         border: const OutlineInputBorder(),
-                      //         label: const Text('First Name'),
-                      //         icon: const Icon(Icons.person)),
-                      //   ),
-                      // ),
-                      // const Text('Enter your first name')
+                     
                     ],
                   ),
                 )

@@ -6,14 +6,13 @@ class FocusChangeNotifier extends ChangeNotifier {
 
   bool get isFocused => _isFocused;
 
-  void setFocus(bool value) {
-    _isFocused = value;
+  void setFocus() {
+    _isFocused = !_isFocused;
     notifyListeners();
   }
-
-  
 }
 
-final focusChangeNotifierProvider = ChangeNotifierProvider<FocusChangeNotifier>((ref) {
+final focusChangeNotifierProvider =
+    ChangeNotifierProvider<FocusChangeNotifier>((ref) {
   return FocusChangeNotifier();
 });

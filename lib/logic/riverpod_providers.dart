@@ -22,6 +22,7 @@ final connectivityStatus = StreamProvider<ConnectivityStatus>((ref) {
 final settingsStreamProvider = StreamProvider((ref) {
   return Store().settingsStream;
 });
+
 class IsBuyingChangeNotifier extends ChangeNotifier {
   bool isBuying = true;
 
@@ -53,4 +54,6 @@ final buyingRateData = StreamProvider<Rate>((ref) => Store().currentBuyingRate);
 final sellingRateData =
     StreamProvider<Rate>((ref) => Store().currentSellingRate);
 
-final stockStream = StreamProvider<StockModel>((ref) => Store().currentStock);
+final stockStream = StreamProvider<StockModel>((ref) => Store().assinedStock);
+final currentStockStreamProvider =
+    StreamProvider<StockModel>((ref) => Store().currentStock);

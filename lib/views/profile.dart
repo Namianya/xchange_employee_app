@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class ProfilePage extends ConsumerWidget {
     Size size = MediaQuery.of(context).size;
     final _currentUser = ref.watch(currentUserData);
     final _stockModel = ref.watch(stockStream);
+    var f = NumberFormat("#,###,###,###.0#", "en_US");
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -28,7 +30,7 @@ class ProfilePage extends ConsumerWidget {
                   tag: 'avatar',
                   child: CircleAvatar(
                     child: Icon(Icons.person),
-                    radius: MediaQuery.of(context).size.width * 0.2,
+                    radius: 100,
                   )),
               const SizedBox(
                 height: 30,
@@ -78,15 +80,15 @@ class ProfilePage extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          'KSH: ${d.ksh}',
+                          'KSH: ${f.format(d.ksh)}',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                         Text(
-                          'USH: ${d.ush}',
+                          'USH: ${f.format(d.ush)}',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                         Text(
-                          'USD: ${d.usd}',
+                          'USD: ${f.format(d.usd)}',
                           style: Theme.of(context).textTheme.headline6,
                         ),
                       ],

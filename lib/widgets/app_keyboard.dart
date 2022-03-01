@@ -1,17 +1,15 @@
 library my_keyboard;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
+
 import 'package:fare_rate_mm/logic/dropdown_provider.dart';
 import 'package:fare_rate_mm/logic/focus_change_notifire.dart';
 import 'package:fare_rate_mm/logic/loading_change_provider.dart';
 import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
-import 'package:fare_rate_mm/models/tranasction_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fare_rate_mm/widgets/new_buy_sell_fun.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../services/data_store.dart';
 
 typedef KeyboardTapCallback = void Function(String text);
 
@@ -51,16 +49,13 @@ class AppKeyboard extends ConsumerWidget {
 
     final _isByBuyingState = ref.watch(isBuyingChangeNotifier);
     final _inputTextChangeNotifire = ref.watch(inputTextChangeNotifire);
+    final _inputTextChangeNotifire2 = ref.watch(inputTextChangeNotifire);
     final _currentBuyingRate = ref.watch(buyingRateData);
     final _currentSellingRate = ref.watch(sellingRateData);
     final _dropdownProvider = ref.watch(dropDownChangeNotifire);
     final _isLoadingProvider = ref.watch(isLoadingChangeProvider);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
     final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
-    late double _fromAmount;
-    late double _toAmount;
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    Store _store = Store();
 
     Widget _calcButton(String value, BuildContext context) {
       return InkWell(
@@ -78,6 +73,247 @@ class AppKeyboard extends ConsumerWidget {
                   color: value == 'DEL' ? Colors.red : Colors.black)),
         ),
       );
+    }
+
+    void buySell() {
+      if (_isByBuyingState.isBuying) {
+        if (_focusChangeNotifierProvider.isFocused) {
+          _dropdownProvider.dropDownValue == 'UG'
+              ? _inputTextChangeNotifire.calculateSellingTextInvert(
+                  _currentBuyingRate.value!.ush,
+                  currency: _dropdownProvider.dropDownValue,
+                )
+              : _inputTextChangeNotifire.calculateBuyingTextInvert(
+                  _currentBuyingRate.value!.usd,
+                  currency: _dropdownProvider.dropDownValue,
+                );
+          // ?
+          if (_dropdownProvider.dropDownValue == 'UG' &&
+              _currentStockStreamProvider.value!.ush <
+                  double.parse(_inputTextChangeNotifire.inputText!)) {
+            _inputTextChangeNotifire.inputText = null;
+            _inputTextChangeNotifire.calculatedText = 0;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  ' USH float is not enough',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else if (_dropdownProvider.dropDownValue == 'US' &&
+              _currentStockStreamProvider.value!.usd <
+                  double.parse(_inputTextChangeNotifire.inputText!)) {
+            _inputTextChangeNotifire.inputText = null;
+            _inputTextChangeNotifire.calculatedText = 0;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  'Too low float',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else {
+            addTransactionToFirebase(
+              isBuying: true,
+              rate: _inputTextChangeNotifire.currentRate!,
+              context: context,
+              currency: _dropdownProvider.dropDownValue,
+              initialVal: roundDouble(_inputTextChangeNotifire.calculatedText),
+              finalVal: double.parse(_inputTextChangeNotifire.inputText!),
+            );
+            updateCurrentStock(
+              context: context,
+              from: _currentStockStreamProvider.value!.ksh +
+                  roundDouble(_inputTextChangeNotifire2.calculatedText),
+              to: _dropdownProvider.dropDownValue == 'UG'
+                  ? _currentStockStreamProvider.value!.ush -
+                      double.parse(_inputTextChangeNotifire2.inputText!)
+                  : _currentStockStreamProvider.value!.usd -
+                      double.parse(_inputTextChangeNotifire2.inputText!),
+              fromName: 'ksh',
+              toName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
+            );
+          }
+        } else {
+          _dropdownProvider.dropDownValue == 'UG'
+              ? _inputTextChangeNotifire.calculateSellingText(
+                  _currentBuyingRate.value!.ush,
+                  currency: _dropdownProvider.dropDownValue,
+                )
+              : _inputTextChangeNotifire.calculateBuyingText(
+                  _currentBuyingRate.value!.usd,
+                  currency: _dropdownProvider.dropDownValue,
+                );
+
+          // ?
+          if (_dropdownProvider.dropDownValue == 'UG' &&
+              _currentStockStreamProvider.value!.ush <
+                  _inputTextChangeNotifire.calculatedText) {
+            _inputTextChangeNotifire.calculatedText = 0;
+            _inputTextChangeNotifire.inputText = null;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  ' USH float is not enough',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else if (_dropdownProvider.dropDownValue == 'US' &&
+              _currentStockStreamProvider.value!.usd <
+                  _inputTextChangeNotifire.calculatedText) {
+            _inputTextChangeNotifire.calculatedText = 0;
+            _inputTextChangeNotifire.inputText = null;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  'Too low float',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else {
+            addTransactionToFirebase(
+              isBuying: true,
+              rate: _inputTextChangeNotifire.currentRate!,
+              context: context,
+              currency: _dropdownProvider.dropDownValue,
+              finalVal: roundDouble(_inputTextChangeNotifire.calculatedText),
+              initialVal: double.parse(_inputTextChangeNotifire.inputText!),
+            );
+            updateCurrentStock(
+              context: context,
+              from: _currentStockStreamProvider.value!.ksh +
+                  double.parse(_inputTextChangeNotifire2.inputText!),
+              to: _dropdownProvider.dropDownValue == 'UG'
+                  ? _currentStockStreamProvider.value!.ush -
+                      roundDouble(_inputTextChangeNotifire2.calculatedText)
+                  : _currentStockStreamProvider.value!.usd -
+                      roundDouble(_inputTextChangeNotifire2.calculatedText),
+              fromName: 'ksh',
+              toName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
+            );
+          }
+        }
+      } else {
+        // selling
+        if (_focusChangeNotifierProvider.isFocused) {
+          // is focussed
+          if (_dropdownProvider.dropDownValue == 'UG') {
+            _inputTextChangeNotifire.calculateBuyingTextInvert(
+              _currentSellingRate.value!.ush,
+              currency: _dropdownProvider.dropDownValue,
+            );
+          } else {
+            _inputTextChangeNotifire.calculateSellingTextInvert(
+              _currentSellingRate.value!.usd,
+              currency: _dropdownProvider.dropDownValue,
+            );
+          }
+
+// ?
+          if (_currentStockStreamProvider.value!.ksh <
+              double.parse(_inputTextChangeNotifire.inputText!)) {
+            _inputTextChangeNotifire.calculatedText = 0;
+            _inputTextChangeNotifire.inputText = null;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  ' KSH float is not enough',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else {
+            addTransactionToFirebase(
+              isBuying: false,
+              rate: _inputTextChangeNotifire.currentRate!,
+              context: context,
+              currency: _dropdownProvider.dropDownValue,
+              initialVal: roundDouble(_inputTextChangeNotifire.calculatedText),
+              finalVal: double.parse(_inputTextChangeNotifire.inputText!),
+            );
+
+// *
+// *
+// *
+            updateCurrentStock(
+              context: context,
+              to: _currentStockStreamProvider.value!.ksh -
+                  double.parse(_inputTextChangeNotifire2.inputText!),
+              from: _dropdownProvider.dropDownValue == 'UG'
+                  ? _currentStockStreamProvider.value!.ush +
+                      roundDouble(_inputTextChangeNotifire2.calculatedText)
+                  : _currentStockStreamProvider.value!.usd +
+                      roundDouble(_inputTextChangeNotifire2.calculatedText),
+              toName: 'ksh',
+              fromName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
+            );
+          }
+        } else {
+          // ! is selling !focused
+          _dropdownProvider.dropDownValue == 'UG'
+              ? _inputTextChangeNotifire.calculateBuyingText(
+                  _currentSellingRate.value!.ush,
+                  currency: _dropdownProvider.dropDownValue,
+                )
+              : _inputTextChangeNotifire.calculateSellingText(
+                  _currentSellingRate.value!.usd,
+                  currency: _dropdownProvider.dropDownValue,
+                );
+
+//  ?
+          if (_currentStockStreamProvider.value!.ksh <
+              _inputTextChangeNotifire.calculatedText) {
+            _inputTextChangeNotifire.calculatedText = 0;
+            _inputTextChangeNotifire.inputText = null;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: Duration(milliseconds: 4000),
+                backgroundColor: Colors.white,
+                content: Text(
+                  ' KSH float is not enough',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          } else {
+            addTransactionToFirebase(
+              isBuying: false,
+              rate: _inputTextChangeNotifire.currentRate!,
+              context: context,
+              currency: _dropdownProvider.dropDownValue,
+              finalVal: roundDouble(_inputTextChangeNotifire.calculatedText),
+              initialVal: double.parse(_inputTextChangeNotifire.inputText!),
+            );
+            updateCurrentStock(
+              context: context,
+              to: _currentStockStreamProvider.value!.ksh -
+                  roundDouble(_inputTextChangeNotifire2.calculatedText),
+              from: _dropdownProvider.dropDownValue == 'UG'
+                  ? _currentStockStreamProvider.value!.ush +
+                      double.parse(_inputTextChangeNotifire2.inputText!)
+                  : _currentStockStreamProvider.value!.usd +
+                      double.parse(_inputTextChangeNotifire2.inputText!),
+              toName: 'ksh',
+              fromName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
+            );
+          }
+        }
+      }
     }
 
     return Container(
@@ -108,7 +344,7 @@ class AppKeyboard extends ConsumerWidget {
           ),
           Row(
             children: <Widget>[
-              _calcButton('DEL', context),
+              _calcButton('00', context),
               _calcButton('0', context),
               _calcButton('.', context),
             ],
@@ -119,7 +355,9 @@ class AppKeyboard extends ConsumerWidget {
               InkWell(
                 splashColor: Colors.red[900],
                 borderRadius: BorderRadius.circular(5),
-                onTap: () => _inputTextChangeNotifire.reset(),
+                onTap: () => _inputTextChangeNotifire.calculatedText != 0
+                    ? _inputTextChangeNotifire.reset()
+                    : _inputTextChangeNotifire.onKeyboardDel(),
                 child: Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -129,7 +367,9 @@ class AppKeyboard extends ConsumerWidget {
                   width: size.width * 0.4,
                   height: 60,
                   child: Text(
-                    'CLEAR',
+                    _inputTextChangeNotifire.calculatedText != 0
+                        ? 'CLEAR'
+                        : 'DELETE',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -138,429 +378,81 @@ class AppKeyboard extends ConsumerWidget {
                   ),
                 ),
               ),
-              _isByBuyingState.isBuying
-                  ? _currentBuyingRate.when(
-                      data: (data) => _inputTextChangeNotifire.calculatedText !=
-                              0
-                          ? Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              width: size.width * 0.4,
-                              height: 60,
-                              child: _isLoadingProvider.isLoading
-                                  ? const CircularProgressIndicator()
-                                  : Text(
-                                      'CALCULATE',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            )
-                          : InkWell(
-                              splashColor: Colors.green[900],
-                              borderRadius: BorderRadius.circular(5),
-                              onTap: _inputTextChangeNotifire.inputText != null
-                                  ? () => {
-                                        _dropdownProvider.dropDownValue == 'US'
-                                            ? _focusChangeNotifierProvider
-                                                    .isFocused
-                                                ? _inputTextChangeNotifire
-                                                    .calculateBuyingTextInvert(
-                                                    _dropdownProvider
-                                                                .dropDownValue ==
-                                                            'UG'
-                                                        ? data.ush
-                                                        : data.usd,
-                                                    currency: _dropdownProvider
-                                                        .dropDownValue,
-                                                  )
-                                                : _inputTextChangeNotifire
-                                                    .calculateBuyingText(
-                                                    _dropdownProvider
-                                                                .dropDownValue ==
-                                                            'UG'
-                                                        ? data.ush
-                                                        : data.usd,
-                                                    currency: _dropdownProvider
-                                                        .dropDownValue,
-                                                  )
-                                            // !!
-                                            : _focusChangeNotifierProvider
-                                                    .isFocused
-                                                ? _inputTextChangeNotifire
-                                                    .calculateSellingTextInvert(
-                                                    _dropdownProvider
-                                                                .dropDownValue ==
-                                                            'UG'
-                                                        ? data.ush
-                                                        : data.usd,
-                                                    currency: _dropdownProvider
-                                                        .dropDownValue,
-                                                  )
-                                                : _inputTextChangeNotifire
-                                                    .calculateSellingText(
-                                                    _dropdownProvider
-                                                                .dropDownValue ==
-                                                            'UG'
-                                                        ? data.ush
-                                                        : data.usd,
-                                                    currency: _dropdownProvider
-                                                        .dropDownValue,
-                                                  ),
-                                        _isLoadingProvider.changeLoadingState(),
-                                        _store.updateCurrentStock(
-                                          from: _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _currentStockStreamProvider
-                                                      .value!.ksh +
-                                                  _inputTextChangeNotifire
-                                                      .calculatedText
-                                              : _currentStockStreamProvider
-                                                      .value!.ksh +
-                                                  double.parse(
-                                                      _inputTextChangeNotifire
-                                                          .inputText!),
-                                          to: _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _dropdownProvider
-                                                          .dropDownValue ==
-                                                      'UG'
-                                                  ? _currentStockStreamProvider
-                                                          .value!.ush -
-                                                      double.parse(
-                                                          _inputTextChangeNotifire
-                                                              .inputText!)
-                                                  : _currentStockStreamProvider
-                                                          .value!.usd -
-                                                      double.parse(
-                                                          _inputTextChangeNotifire
-                                                              .inputText!)
-                                              : _dropdownProvider
-                                                          .dropDownValue ==
-                                                      'UG'
-                                                  ? _currentStockStreamProvider
-                                                          .value!.ush -
-                                                      _inputTextChangeNotifire
-                                                          .calculatedText
-                                                  : _currentStockStreamProvider
-                                                          .value!.usd -
-                                                      _inputTextChangeNotifire
-                                                          .calculatedText,
-                                          fromName: 'ksh',
-                                          toName:
-                                              _dropdownProvider.dropDownValue ==
-                                                      'UG'
-                                                  ? 'ush'
-                                                  : 'usd',
-                                        ),
-//  TODO:slove this
-                                        FirebaseFirestore.instance
-                                            .collection('transactions')
-                                            .add(
-                                              TransactionModel(
-                                                      userNumber: FirebaseAuth
-                                                          .instance
-                                                          .currentUser!
-                                                          .phoneNumber,
-                                                      currency: _dropdownProvider
-                                                          .dropDownValue,
-                                                      // ? chnges done here
-                                                      finalValue: _focusChangeNotifierProvider
-                                                              .isFocused
-                                                          ? double.parse(
-                                                              _inputTextChangeNotifire
-                                                                  .inputText!)
-                                                          : _inputTextChangeNotifire
-                                                              .calculatedText,
-                                                      initialValue: _focusChangeNotifierProvider
-                                                              .isFocused
-                                                          ? _inputTextChangeNotifire
-                                                              .calculatedText
-                                                          : double.parse(
-                                                              _inputTextChangeNotifire
-                                                                  .inputText!),
-                                                      isBuying: _isByBuyingState
-                                                          .isBuying,
-                                                      rate:
-                                                          _inputTextChangeNotifire
-                                                              .currentRate!,
-                                                      transactionTime: FieldValue
-                                                          .serverTimestamp())
-                                                  .toMap(),
-                                            )
-                                            .then((value) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              backgroundColor: Colors.white,
-                                              content: Text(
-                                                'Successful',
-                                                style: TextStyle(
-                                                    color: Colors.green),
-                                              ),
-                                            ),
-                                          );
-                                        }).catchError((e) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              backgroundColor: Colors.white,
-                                              content: Text(
-                                                'Something went wrong, please try again',
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                        _isLoadingProvider.changeLoadingState(),
-                                      }
-                                  : () => ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          duration: Duration(seconds: 1),
-                                          content: Text(
-                                            'Please enter a value',
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ),
-                              child: _isLoadingProvider.isLoading
-                                  ? const CircularProgressIndicator()
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      width: size.width * 0.4,
-                                      height: 60,
-                                      child: _isLoadingProvider.isLoading
-                                          ? const CircularProgressIndicator()
-                                          : Text(
-                                              'CALCULATE',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                    ),
-                            ),
-                      error: (e, s) => Text('$e'),
-                      loading: () => Text('Loading ...'))
-                  : _currentSellingRate.when(
-                      data: (data) => InkWell(
-                            splashColor: Colors.green[900],
+              _currentBuyingRate.when(
+                  data: (data) => _inputTextChangeNotifire.calculatedText !=
+                              0 ||
+                          _inputTextChangeNotifire.inputText == null
+                      ? Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
                             borderRadius: BorderRadius.circular(5),
-                            onTap: _inputTextChangeNotifire.inputText != null
-                                ? () => {
-                                      _dropdownProvider.dropDownValue == 'US'
-                                          ? _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _inputTextChangeNotifire
-                                                  .calculateSellingTextInvert(
-                                                  _dropdownProvider
-                                                              .dropDownValue ==
-                                                          'UG'
-                                                      ? data.ush
-                                                      : data.usd,
-                                                  currency: _dropdownProvider
-                                                      .dropDownValue,
-                                                )
-                                              : _inputTextChangeNotifire
-                                                  .calculateSellingText(
-                                                  _dropdownProvider
-                                                              .dropDownValue ==
-                                                          'UG'
-                                                      ? data.ush
-                                                      : data.usd,
-                                                  currency: _dropdownProvider
-                                                      .dropDownValue,
-                                                )
-                                          // !
-                                          : _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _inputTextChangeNotifire
-                                                  .calculateBuyingTextInvert(
-                                                  _dropdownProvider
-                                                              .dropDownValue ==
-                                                          'UG'
-                                                      ? data.ush
-                                                      : data.usd,
-                                                  currency: _dropdownProvider
-                                                      .dropDownValue,
-                                                )
-                                              : _inputTextChangeNotifire
-                                                  .calculateBuyingText(
-                                                  _dropdownProvider
-                                                              .dropDownValue ==
-                                                          'UG'
-                                                      ? data.ush
-                                                      : data.usd,
-                                                  currency: _dropdownProvider
-                                                      .dropDownValue,
-                                                ),
-                                      _isLoadingProvider.changeLoadingState(),
-                                      // todo: add a snackbar
-
-                                      firestore
-                                          .collection('transactions')
-                                          .add(
-                                            TransactionModel(
-                                                    userNumber: FirebaseAuth
-                                                        .instance
-                                                        .currentUser!
-                                                        .phoneNumber,
-                                                    currency: _dropdownProvider
-                                                        .dropDownValue,
-                                                    finalValue: _focusChangeNotifierProvider
-                                                            .isFocused
-                                                        ? double.parse(
-                                                            _inputTextChangeNotifire
-                                                                .inputText!)
-                                                        : _inputTextChangeNotifire
-                                                            .calculatedText,
-                                                    initialValue:
-                                                        _focusChangeNotifierProvider
-                                                                .isFocused
-                                                            ? _inputTextChangeNotifire
-                                                                .calculatedText
-                                                            : double.parse(
-                                                                _inputTextChangeNotifire
-                                                                    .inputText!),
-                                                    isBuying: _isByBuyingState
-                                                        .isBuying,
-                                                    rate:
-                                                        _inputTextChangeNotifire
-                                                            .currentRate!,
-                                                    transactionTime: FieldValue
-                                                        .serverTimestamp())
-                                                .toMap(),
-                                          )
-                                          .then((value) {
-                                        _store.updateCurrentStock(
-                                          from: _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _dropdownProvider
-                                                          .dropDownValue ==
-                                                      'UG'
-                                                  ? _currentStockStreamProvider
-                                                          .value!.ush +
-                                                      ref
-                                                          .watch(
-                                                              inputTextChangeNotifire)
-                                                          .calculatedText
-                                                  : _currentStockStreamProvider
-                                                          .value!.usd +
-                                                      ref
-                                                          .watch(
-                                                              inputTextChangeNotifire)
-                                                          .calculatedText
-                                              : _dropdownProvider
-                                                          .dropDownValue ==
-                                                      'UG'
-                                                  ? _currentStockStreamProvider
-                                                          .value!.ush +
-                                                      double.parse(ref
-                                                          .watch(
-                                                              inputTextChangeNotifire)
-                                                          .inputText!)
-                                                  : _currentStockStreamProvider
-                                                          .value!.usd +
-                                                      double.parse(ref
-                                                          .watch(
-                                                              inputTextChangeNotifire)
-                                                          .inputText!),
-                                          to: _focusChangeNotifierProvider
-                                                  .isFocused
-                                              ? _currentStockStreamProvider
-                                                      .value!.ksh -
-                                                  double.parse(ref
-                                                      .watch(
-                                                          inputTextChangeNotifire)
-                                                      .inputText!)
-                                              : _currentStockStreamProvider
-                                                      .value!.ksh -
-                                                  ref
-                                                      .watch(
-                                                          inputTextChangeNotifire)
-                                                      .calculatedText,
-                                          fromName:
-                                              _dropdownProvider.dropDownValue ==
-                                                      'UG'
-                                                  ? 'ush'
-                                                  : 'usd',
-                                          toName: 'ksh',
-                                        );
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.white,
-                                            content: Text(
-                                              'Successful',
-                                              style: TextStyle(
-                                                  color: Colors.green),
-                                            ),
-                                          ),
-                                        );
-                                      }).catchError((e) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.white,
-                                            content: Text(
-                                              'Something went wrong, please try again',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-
-                                      _isLoadingProvider.changeLoadingState(),
-                                    }
-                                : () =>
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        duration: Duration(seconds: 1),
-                                        content: Text(
-                                          'Please enter a value',
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.indigo,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              width: size.width * 0.4,
-                              height: 60,
-                              child: _isLoadingProvider.isLoading
-                                  ? const CircularProgressIndicator()
-                                  : Text(
-                                      'CALCULATE',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
                           ),
-                      error: (e, s) => Text('$e'),
-                      loading: () => Text('Loading ...')),
+                          width: size.width * 0.4,
+                          height: 60,
+                          child: _isLoadingProvider.isLoading
+                              ? const CircularProgressIndicator()
+                              : Text(
+                                  'CALCULATE',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        )
+                      : InkWell(
+                          splashColor: _isByBuyingState.isBuying
+                              ? Colors.green[900]
+                              : Colors.indigo[900],
+                          borderRadius: BorderRadius.circular(5),
+                          onTap: _inputTextChangeNotifire.inputText != null
+                              ? () => buySell()
+                              : () =>
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      duration: Duration(seconds: 1),
+                                      content: Text(
+                                        'Please enter a value',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                          child: _isLoadingProvider.isLoading
+                              ? const CircularProgressIndicator()
+                              : Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: _isByBuyingState.isBuying
+                                        ? Colors.green
+                                        : Colors.indigo,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  width: size.width * 0.4,
+                                  height: 60,
+                                  child: _isLoadingProvider.isLoading
+                                      ? const CircularProgressIndicator()
+                                      : Text(
+                                          'CALCULATE',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                ),
+                        ),
+                  error: (e, s) => Text('$e'),
+                  loading: () => Text('Loading ...'))
             ],
           )
         ],
       ),
     );
   }
+}
+
+double roundDouble(double value) {
+  num mod = pow(10.0, 2);
+  return ((value * mod).round().toDouble() / mod);
 }

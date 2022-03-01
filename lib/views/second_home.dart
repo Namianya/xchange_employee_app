@@ -14,6 +14,10 @@ import 'package:fare_rate_mm/widgets/app_keyboard.dart';
 import 'package:flag/flag_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import '../widgets/focused_ui.dart';
+import '../widgets/not_focused_ui.dart';
 
 class SecondHome extends ConsumerWidget {
   const SecondHome({Key? key}) : super(key: key);
@@ -28,7 +32,7 @@ class SecondHome extends ConsumerWidget {
     final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
     final _connectivityStreamProvider = ref.watch(connectivityStreamProvider);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
-
+    var f = NumberFormat("#,###,###,###.0#", "en_US");
     return _connectivityStreamProvider.when(
       data: (data) => data == ConnectivityStatus.WiFi ||
               data == ConnectivityStatus.Cellular
@@ -205,8 +209,7 @@ class SecondHome extends ConsumerWidget {
                                   ],
                                 ),
                                 loading: () => Text('Loading...'),
-                                error: (e, s) => Text(
-                                    'Current Stock dissabled by developer'),
+                                error: (e, s) => Text('Stock Error'),
                               ),
                       ],
                     ),
@@ -214,158 +217,8 @@ class SecondHome extends ConsumerWidget {
 
                     // !when focused
                     _focusChangeNotifierProvider.isFocused
-                        ? Column(
-                            children: [
-                              Text(
-                                '${_inputTextChangeNotifire.inputText ?? "Enter Amount in"}' +
-                                    "  ${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue == 'US' ? 'USD' : 'USH' : 'KE'}",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline4
-                                    ?.copyWith(
-                                      color:
-                                          _inputTextChangeNotifire.inputText !=
-                                                  null
-                                              ? Colors.black
-                                              : Colors.grey,
-                                    ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${_inputTextChangeNotifire.calculatedText}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline3
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: _inputTextChangeNotifire
-                                                      .inputText !=
-                                                  ""
-                                              ? Colors.black
-                                              : Colors.grey,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  _isByBuyingState.isBuying
-                                      ? Text(
-                                          _isByBuyingState.isBuying
-                                              ? 'KSH'
-                                              : _dropdownProvider
-                                                          .dropDownValue ==
-                                                      'US'
-                                                  ? 'USD'
-                                                  : 'USH',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5
-                                              ?.copyWith(
-                                                color: _inputTextChangeNotifire
-                                                            .inputText !=
-                                                        ""
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                              ),
-                                        )
-                                      : Text(
-                                          _isByBuyingState.isBuying
-                                              ? 'KSH'
-                                              : _dropdownProvider.dropDownValue,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5
-                                              ?.copyWith(
-                                                color: _inputTextChangeNotifire
-                                                            .inputText !=
-                                                        ""
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                              ),
-                                        )
-                                ],
-                              ),
-                            ],
-                          )
-                        :
-                        // !if not focused
-                        Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '${_inputTextChangeNotifire.calculatedText}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headline3
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: _inputTextChangeNotifire
-                                                      .inputText !=
-                                                  ""
-                                              ? Colors.black
-                                              : Colors.grey,
-                                        ),
-                                  ),
-                                  const SizedBox(
-                                    width: 15,
-                                  ),
-                                  _isByBuyingState.isBuying
-                                      ? Text(
-                                          _dropdownProvider.dropDownValue ==
-                                                  'US'
-                                              ? 'USD'
-                                              : 'USH',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5
-                                              ?.copyWith(
-                                                color: _inputTextChangeNotifire
-                                                            .inputText !=
-                                                        ""
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                              ),
-                                        )
-                                      : Text(
-                                          'KSH',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline5
-                                              ?.copyWith(
-                                                color: _inputTextChangeNotifire
-                                                            .inputText !=
-                                                        ""
-                                                    ? Colors.black
-                                                    : Colors.grey,
-                                              ),
-                                        )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                '${_inputTextChangeNotifire.inputText ?? "Enter Amount"}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline4
-                                    ?.copyWith(
-                                      color:
-                                          _inputTextChangeNotifire.inputText !=
-                                                  null
-                                              ? Colors.black
-                                              : Colors.grey,
-                                    ),
-                              ),
-                            ],
-                          ),
+                        ? FocusedUI()
+                        : NotFocusedUI(),
 
                     const Spacer(),
                     _currentStockStreamProvider.when(
@@ -373,21 +226,21 @@ class SecondHome extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '  KSH:  ${data.ksh}',
+                            '  KSH:  ${roundDouble4(data.ksh)}',
                             style: Theme.of(context)
                                 .textTheme
                                 .caption
                                 ?.copyWith(fontSize: 16),
                           ),
                           Text(
-                            '  USH:  ${data.ush}',
+                            '  USH:  ${roundDouble4(data.ush)}',
                             style: Theme.of(context)
                                 .textTheme
                                 .caption
                                 ?.copyWith(fontSize: 16),
                           ),
                           Text(
-                            '  USD:  ${data.usd}',
+                            '  USD:  ${roundDouble4(data.usd)}',
                             style: Theme.of(context)
                                 .textTheme
                                 .caption
@@ -412,8 +265,8 @@ class SecondHome extends ConsumerWidget {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () => {
+                            _inputTextChangeNotifire.reset(),
                             _isByBuyingState.setIsBuying(),
-                            _inputTextChangeNotifire.reset()
                           },
                           style: ElevatedButton.styleFrom(
                             primary: _isByBuyingState.isBuying
@@ -428,8 +281,8 @@ class SecondHome extends ConsumerWidget {
                         ),
                         ElevatedButton.icon(
                           onPressed: () => {
-                            _focusChangeNotifierProvider.setFocus(),
                             _inputTextChangeNotifire.reset(),
+                            _focusChangeNotifierProvider.setFocus(),
                           },
                           style: ElevatedButton.styleFrom(
                               primary: _focusChangeNotifierProvider.isFocused
@@ -472,4 +325,9 @@ extension Precision on double {
     num mod = pow(10, fractionDigits.toDouble());
     return ((this * mod).round().toDouble() / mod);
   }
+}
+
+double roundDouble4(double value) {
+  num mod = pow(10.0, 2);
+  return ((value * mod).round().toDouble() / mod);
 }

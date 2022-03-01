@@ -1,314 +1,448 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:my_keyboard/my_keyboard.dart';
+import 'package:fare_rate_mm/logic/dropdown_provider.dart';
+import 'package:fare_rate_mm/logic/focus_change_notifire.dart';
+import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
+// import 'package:fare_rate_mm/models/rate.dart';
+import 'package:fare_rate_mm/logic/riverpod_providers.dart';
+import 'package:fare_rate_mm/network/connectivity_service.dart';
+import 'package:fare_rate_mm/network/connectivity_status.dart';
+import 'package:fare_rate_mm/views/no_network.dart';
 import 'package:fare_rate_mm/views/profile.dart';
-import 'package:flag/flag.dart';
+import 'package:fare_rate_mm/widgets/app_keyboard.dart';
+import 'package:flag/flag_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-class Home extends StatefulWidget {
+
+class Home extends ConsumerWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  String text = '';
-  String buyingDropdownValue = "Ksh";
-  String dropdownValue = "ush";
-  double rate = 0;
-  double result = 0;
-  bool isBuying = true;
-  bool isResult = false;
-  bool isLoading = false;
-  String ushName = '';
-  String usdName = '';
-  String flagChosen = 'UG';
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const Icon(Icons.menu),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ProfilePage(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _currentBuyingRate = ref.watch(buyingRateData);
+    final _currentSellingRate = ref.watch(sellingRateData);
+    final _isByBuyingState = ref.watch(isBuyingChangeNotifier);
+    final _dropdownProvider = ref.watch(dropDownChangeNotifire);
+    final _inputTextChangeNotifire = ref.watch(inputTextChangeNotifire);
+    final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
+    final _connectivityStreamProvider = ref.watch(connectivityStreamProvider);
+    final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
+    var f = NumberFormat("#,###,###,###.0#", "en_US");
+    return _connectivityStreamProvider.value == ConnectivityStatus.WiFi ||
+            _connectivityStreamProvider.value == ConnectivityStatus.Cellular
+        ? Scaffold(
+            appBar: AppBar(
+              // leading: const Icon(Icons.menu),
+              actions: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
+                  },
+                  child: const Hero(
+                    tag: 'avatar',
+                    child: CircleAvatar(
+                      child: FlutterLogo(),
+                      radius: 20,
+                    ),
+                  ),
                 ),
-              );
-            },
-            child: const Hero(
-              tag: 'avatar',
-              child: CircleAvatar(
-                child: FlutterLogo(),
-                radius: 20,
-              ),
+                const SizedBox(
+                  width: 15,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(
-            width: 15,
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            // mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButton<String>(
-                value: buyingDropdownValue,
-                icon: Icon(
-                  Icons.arrow_drop_down_sharp,
-                  color: isBuying ? Colors.green : Colors.orange,
-                ),
-                iconSize: 24,
-                elevation: 16,
-                style: Theme.of(context).textTheme.headline6,
-                underline: Container(
-                  height: 2,
-                  color: isBuying ? Colors.green : Colors.orange,
-                ),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    buyingDropdownValue = newValue!;
-                  });
-                },
-                items: <String>[
-                  'Ksh',
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              StreamBuilder<DocumentSnapshot>(
-                stream: isBuying
-                    ? FirebaseFirestore.instance
-                        .collection('buyingRate')
-                        .doc('6PKMVxXXAvwAxhdcDZsr')
-                        .snapshots()
-                    : FirebaseFirestore.instance
-                        .collection('sellingRate')
-                        .doc('dLLxgZBJkAayNKDqLOMX')
-                        .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Icon(
-                      Icons.error,
-                      color: Colors.red,
-                    );
-                  }
-                  if (snapshot.hasData && !snapshot.data!.exists) {
-                    return const Icon(
-                      Icons.warning,
-                      color: Colors.orange,
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.active) {
-                    Map<String, dynamic> data =
-                        snapshot.data!.data() as Map<String, dynamic>;
-                    if (data != null) {
-                      ushName = 'USH: ${data['Ush']}';
-                      usdName = 'USD: ${data['Usd']}';
-                      return DropdownButton<String?>(
-                        value: dropdownValue,
-                        icon: Icon(
-                          Icons.arrow_drop_down_sharp,
-                          color: isBuying ? Colors.green : Colors.orange,
-                        ),
-                        iconSize: 24,
-                        elevation: 16,
-                        style: Theme.of(context).textTheme.headline6,
-                        underline: Container(
-                          height: 2,
-                          color: isBuying ? Colors.green : Colors.orange,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                          });
+            body: Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flag.fromString(
+                                'KE',
+                                height: 20,
+                                width: 30,
+                                fit: BoxFit.fill,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'KSH',
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    color: _isByBuyingState.isBuying
+                                        ? Colors.green
+                                        : Colors.indigo),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            '1',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6
+                                ?.copyWith(
+                                    color: _isByBuyingState.isBuying
+                                        ? Colors.green
+                                        : Colors.indigo),
+                          ),
+                        ],
+                      ),
+                      _isByBuyingState.isBuying
+                          ? _currentBuyingRate.when(
+                              data: (data) => Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      DropdownButton(
+                                        value: _dropdownProvider.dropDownValue,
+                                        onChanged: (String? value) {
+                                          _dropdownProvider
+                                              .dropDownChange(value!);
+                                        },
+                                        items: [
+                                          'UG',
+                                          'US',
+                                        ]
+                                            .map((e) => DropdownMenuItem(
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Flag.fromString(e,
+                                                          height: 20,
+                                                          width: 30,
+                                                          fit: BoxFit.fill),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        e,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .headline6
+                                                            ?.copyWith(
+                                                              color:
+                                                                  Colors.green,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  value: e,
+                                                ))
+                                            .toList(),
+                                      ),
+                                      Text(
+                                          _dropdownProvider.dropDownValue ==
+                                                  'US'
+                                              ? data.usd
+                                              : data.ush,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline6
+                                              ?.copyWith(color: Colors.green)),
+                                    ],
+                                  ),
+                              error: (e, s) => Text('$e'),
+                              loading: () => Text('Loading ...'))
+                          : _currentSellingRate.when(
+                              data: (data) => Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  DropdownButton(
+                                    value: _dropdownProvider.dropDownValue,
+                                    onChanged: (String? value) {
+                                      _dropdownProvider.dropDownChange(value!);
+                                    },
+                                    items: [
+                                      'UG',
+                                      'US',
+                                    ]
+                                        .map((e) => DropdownMenuItem(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Flag.fromString(e,
+                                                      height: 20,
+                                                      width: 30,
+                                                      fit: BoxFit.fill),
+                                                  SizedBox(width: 10),
+                                                  Text(e,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline6
+                                                          ?.copyWith(
+                                                              color: Colors
+                                                                  .indigo)),
+                                                ],
+                                              ),
+                                              value: e,
+                                            ))
+                                        .toList(),
+                                  ),
+                                  Text(
+                                      _dropdownProvider.dropDownValue == 'US'
+                                          ? data.usd
+                                          : data.ush,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline6
+                                          ?.copyWith(color: Colors.indigo)),
+                                ],
+                              ),
+                              loading: () => Text('Loading...'),
+                              error: (e, s) => Text('Stock Error'),
+                            ),
+                    ],
+                  ),
+                  const Spacer(),
 
-                          if (dropdownValue == 'ush') {
-                            setState(() {
-                              rate = double.parse('${data['Ush']}');
-                            });
-                          } else if (dropdownValue == 'usd') {
-                            setState(() {
-                              rate = double.parse('${data['Usd']}');
-                            });
-                          } else {
-                            rate = 1.0;
-                          }
+                  // !when focused
+                  _focusChangeNotifierProvider.isFocused
+                      ? Column(
+                          children: [
+                            Text(
+                              '${_inputTextChangeNotifire.inputText ?? "Enter Amount in"}' +
+                                  "  ${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue == 'US' ? 'USD' : 'USH' : 'KE'}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  ?.copyWith(
+                                    color: _inputTextChangeNotifire.inputText !=
+                                            null
+                                        ? Colors.black
+                                        : Colors.grey,
+                                  ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${f.format(_inputTextChangeNotifire.calculatedText)}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline3
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: _inputTextChangeNotifire
+                                                    .inputText !=
+                                                ""
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                ),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                _isByBuyingState.isBuying
+                                    ? Text(
+                                        _isByBuyingState.isBuying
+                                            ? 'KSH'
+                                            : _dropdownProvider.dropDownValue ==
+                                                    'US'
+                                                ? 'USD'
+                                                : 'USH',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5
+                                            ?.copyWith(
+                                              color: _inputTextChangeNotifire
+                                                          .inputText !=
+                                                      ""
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                            ),
+                                      )
+                                    : Text(
+                                        _isByBuyingState.isBuying
+                                            ? 'KSH'
+                                            : _dropdownProvider.dropDownValue,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5
+                                            ?.copyWith(
+                                              color: _inputTextChangeNotifire
+                                                          .inputText !=
+                                                      ""
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                            ),
+                                      )
+                              ],
+                            ),
+                          ],
+                        )
+                      :
+                      // !if not focused
+                      Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${f.format(_inputTextChangeNotifire.calculatedText)}',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline3
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: _inputTextChangeNotifire
+                                                    .inputText !=
+                                                ""
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                ),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                _isByBuyingState.isBuying
+                                    ? Text(
+                                        _dropdownProvider.dropDownValue == 'US'
+                                            ? 'USD'
+                                            : 'USH',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5
+                                            ?.copyWith(
+                                              color: _inputTextChangeNotifire
+                                                          .inputText !=
+                                                      ""
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                            ),
+                                      )
+                                    : Text(
+                                        'KSH',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline5
+                                            ?.copyWith(
+                                              color: _inputTextChangeNotifire
+                                                          .inputText !=
+                                                      ""
+                                                  ? Colors.black
+                                                  : Colors.grey,
+                                            ),
+                                      )
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              '${_inputTextChangeNotifire.inputText?.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},') ?? "Enter Amount"}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline4
+                                  ?.copyWith(
+                                    color: _inputTextChangeNotifire.inputText !=
+                                            null
+                                        ? Colors.black
+                                        : Colors.grey,
+                                  ),
+                            ),
+                          ],
+                        ),
+
+                  const Spacer(),
+                  _currentStockStreamProvider.when(
+                    data: (data) => Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '  KSH:  ${roundDouble4(data.ksh)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              ?.copyWith(fontSize: 16),
+                        ),
+                        Text(
+                          '  USH:  ${roundDouble4(data.ush)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              ?.copyWith(fontSize: 16),
+                        ),
+                        Text(
+                          '  USD:  ${roundDouble4(data.usd)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              ?.copyWith(fontSize: 16),
+                        )
+                      ],
+                    ),
+                    error: (Object error, StackTrace? stackTrace) =>
+                        //? Text('err: $error'),
+                        Text(
+                      'Current Stock dissabled by developer',
+                      style: Theme.of(context).textTheme.caption,
+                    ),
+                    loading: () => Text('Loading'),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => {
+                          _inputTextChangeNotifire.reset(),
+                          _isByBuyingState.setIsBuying(),
                         },
-                        items: <String>[
-                          // TODO: change to Ush as trrhe first choice
-                          'ush',
-                          'usd',
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      );
-                    }
-                  }
-
-                  return const CircularProgressIndicator();
-                },
+                        style: ElevatedButton.styleFrom(
+                          primary: _isByBuyingState.isBuying
+                              ? Colors.green
+                              : Colors.indigo,
+                        ),
+                        icon: Icon(_isByBuyingState.isBuying
+                            ? Icons.arrow_forward_rounded
+                            : Icons.arrow_back_rounded),
+                        label: Text(
+                            '${_isByBuyingState.isBuying ? 'BUYING' : 'SELLING'}'),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => {
+                          _inputTextChangeNotifire.reset(),
+                          _focusChangeNotifierProvider.setFocus(),
+                        },
+                        style: ElevatedButton.styleFrom(
+                            primary: _focusChangeNotifierProvider.isFocused
+                                ? Colors.blue
+                                : Colors.grey),
+                        icon: Icon(Icons.swap_vertical_circle_outlined),
+                        label: Text(
+                            '${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue : 'KE'}'
+                                .toUpperCase()),
+                      ),
+                    ],
+                  ),
+                  AppKeyboard(
+                    onKeyboardTap: (text) => (print(text)),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
               ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(
-                '1',
-                style: Theme.of(context).textTheme.headline4?.copyWith(
-                      color: isBuying ? Colors.green : Colors.orange,
-                    ),
-              ),
-              Text(
-                dropdownValue == 'ush' ? ushName : usdName,
-                // '${rate}',
-                style: Theme.of(context).textTheme.headline4?.copyWith(
-                      color: isBuying ? Colors.green : Colors.orange,
-                    ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flag.fromCode(
-                dropdownValue == 'ush' ? FlagsCode.UG : FlagsCode.US,
-                height: 40,
-                width: 70,
-                fit: BoxFit.fill,
-              ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                child: Icon(isBuying ? Icons.arrow_forward : Icons.arrow_back),
-              ),
-              Flag.fromCode(
-                FlagsCode.KE,
-                height: 40,
-                width: 70,
-                fit: BoxFit.fill,
-              ),
-            ],
-          ),
-          const Spacer(),
-          ElevatedButton.icon(
-            icon: isBuying
-                ? const Icon(Icons.arrow_forward)
-                : const Icon(Icons.arrow_back),
-            onPressed: () {
-              setState(() {
-                isBuying = !isBuying;
-              });
-            },
-            label: Text(
-              isBuying ? 'BUYING' : 'SELLING',
             ),
-            style: ElevatedButton.styleFrom(
-                primary: isBuying ? Colors.green : Colors.orange),
-          ),
-          Text(
-            'RESULT',
-            style: Theme.of(context).textTheme.caption,
-          ),
-          const SizedBox(
-            height: 25,
-          ),
-          Text(
-            dropdownValue == rate
-                ? 'Choose a rate'
-                : '${result != 0 ? result : '_ _'} ',
-            style: Theme.of(context)
-                .textTheme
-                .headline3
-                ?.copyWith(color: Colors.black),
-          ),
-          const Spacer(),
-          Text(
-            text,
-            style: Theme.of(context)
-                .textTheme
-                .headline4
-                ?.copyWith(color: Colors.black),
-          ),
-          NumericKeyboard(
-            onKeyboardTap: onKeyboardTap,
-            leftButtonFn: () {
-              setState(() {
-                isLoading = true;
-                if (text == '') {
-                  result = 0;
-                } else {
-                  if (isBuying) {
-                    result = (double.parse(text) * rate).toPrecision(2);
-                  } else {
-                    result = (double.parse(text) / rate).toPrecision(2);
-                  }
-                }
-                String? num = FirebaseAuth.instance.currentUser!.phoneNumber;
-                // print(num);
-                FirebaseFirestore.instance.collection('transactions').add({
-                  'number': num,
-                  'rate': rate,
-                  'currency': dropdownValue,
-                  'isBuying': isBuying,
-                  'input': double.parse(text),
-                  'result': result,
-                  'time': FieldValue.serverTimestamp()
-                });
-
-                isLoading = false;
-              });
-            },
-            rightButtonFn: () {
-              isLoading
-                  ? text
-                  : setState(() {
-                      text = '';
-                      result = 0;
-                    });
-            },
-            leftIcon: isLoading
-                ? const CircularProgressIndicator()
-                : const Icon(
-                    Icons.done,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-            rightButtonColor: isLoading ? Colors.grey : Colors.red[900],
-            leftButtonColor: isLoading ? Colors.grey : Colors.green,
-            rightIcon: isLoading
-                ? const CircularProgressIndicator()
-                : const Icon(
-                    Icons.backspace,
-                    color: Colors.white,
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  onKeyboardTap(String value) {
-    setState(() {
-      text = text + value;
-    });
+          )
+        : const NoNetwork();
   }
 }
 
@@ -317,4 +451,9 @@ extension Precision on double {
     num mod = pow(10, fractionDigits.toDouble());
     return ((this * mod).round().toDouble() / mod);
   }
+}
+
+double roundDouble4(double value) {
+  num mod = pow(10.0, 2);
+  return ((value * mod).round().toDouble() / mod);
 }

@@ -1,7 +1,6 @@
-import 'dart:ffi';
+
 import 'dart:math';
 
-import 'package:fare_rate_mm/logic/riverpod_providers.dart';
 import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,12 +19,12 @@ class InputTextChangeNotifire extends ChangeNotifier {
 
   void onKeyboardType(String value) {
     inputText == null ? inputText = value : inputText = inputText! + value;
-  //  inputText!=null || inputText!='' ? ref.watch() double.parse(inputText!)*currentRate! : 0.00;
+    //  inputText!=null || inputText!='' ? ref.watch() double.parse(inputText!)*currentRate! : 0.00;
     notifyListeners();
   }
 
   void onKeyboardDel() {
-    inputText != null || inputText != ""
+    inputText != null && inputText!.length > 0
         ? inputText = inputText!.substring(0, inputText!.length - 1)
         : inputText = null;
     notifyListeners();
@@ -38,7 +37,7 @@ class InputTextChangeNotifire extends ChangeNotifier {
     currentRate = double.parse(rate!);
 
     calculatedText =
-        roundDouble(double.parse(inputText!) / double.parse(rate), 3);
+        _roundDouble(double.parse(inputText!) / double.parse(rate), 3);
 
     notifyListeners();
   }
@@ -47,12 +46,10 @@ class InputTextChangeNotifire extends ChangeNotifier {
     String? rate, {
     required String currency,
   }) {
-    final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
-    final _isBuying = ref.watch(isBuyingChangeNotifier);
     currentRate = double.parse(rate!);
 
     calculatedText =
-        roundDouble(double.parse(inputText!) * double.parse(rate), 3);
+        _roundDouble(double.parse(inputText!) * double.parse(rate), 3);
 
     notifyListeners();
   }
@@ -63,7 +60,7 @@ class InputTextChangeNotifire extends ChangeNotifier {
   }) {
     currentRate = double.parse(rate!);
     calculatedText =
-        roundDouble(double.parse(inputText!) * double.parse(rate), 3);
+        _roundDouble(double.parse(inputText!) * double.parse(rate), 3);
 
     notifyListeners();
   }
@@ -74,7 +71,7 @@ class InputTextChangeNotifire extends ChangeNotifier {
   }) {
     currentRate = double.parse(rate!);
     calculatedText =
-        roundDouble(double.parse(inputText!) / double.parse(rate), 3);
+        _roundDouble(double.parse(inputText!) / double.parse(rate), 3);
 
     notifyListeners();
   }
@@ -84,12 +81,13 @@ class InputTextChangeNotifire extends ChangeNotifier {
     calculatedText = 0.0;
     notifyListeners();
   }
-}
-
-double roundDouble(double value, int places) {
+  double _roundDouble(double value, int places) {
   num mod = pow(10.0, places);
   return ((value * mod).round().toDouble() / mod);
 }
+}
+
+
 
 final inputTextChangeNotifire =
     ChangeNotifierProvider((ref) => InputTextChangeNotifire(ref));

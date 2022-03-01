@@ -69,17 +69,5 @@ class Store {
   }
 
   // update current stock
-  Future<void> updateCurrentStock({
-    required double from,
-    required double to,
-    required String fromName,
-    required String toName,
-  }) async {
-    await currentStockDocumentRef.update(
-      {
-        fromName: from,
-        toName: to,
-      },
-    );
-  }
+  
 }

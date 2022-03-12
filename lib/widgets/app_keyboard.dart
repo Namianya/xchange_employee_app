@@ -56,6 +56,7 @@ class AppKeyboard extends ConsumerWidget {
     final _isLoadingProvider = ref.watch(isLoadingChangeProvider);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
     final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
+    final _postToFirebase = ref.watch(postToFirebaseProvider);
 
     Widget _calcButton(String value, BuildContext context) {
       return InkWell(
@@ -250,18 +251,19 @@ class AppKeyboard extends ConsumerWidget {
 // *
 // *
 // *
-            updateCurrentStock(
-              context: context,
-              to: _currentStockStreamProvider.value!.ksh -
-                  double.parse(_inputTextChangeNotifire2.inputText!),
-              from: _dropdownProvider.dropDownValue == 'UG'
-                  ? _currentStockStreamProvider.value!.ush +
-                      roundDouble(_inputTextChangeNotifire2.calculatedText)
-                  : _currentStockStreamProvider.value!.usd +
-                      roundDouble(_inputTextChangeNotifire2.calculatedText),
-              toName: 'ksh',
-              fromName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
-            );
+            _postToFirebase.updateCurrentStock(context: context);
+            // updateCurrentStock(
+            //   context: context,
+            //   to: _currentStockStreamProvider.value!.ksh -
+            //       double.parse(_inputTextChangeNotifire2.inputText!),
+            //   from: _dropdownProvider.dropDownValue == 'UG'
+            //       ? _currentStockStreamProvider.value!.ush +
+            //           roundDouble(_inputTextChangeNotifire2.calculatedText)
+            //       : _currentStockStreamProvider.value!.usd +
+            //           roundDouble(_inputTextChangeNotifire2.calculatedText),
+            //   toName: 'ksh',
+            //   fromName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
+            // );
           }
         } else {
           // ! is selling !focused

@@ -207,7 +207,9 @@ class AppKeyboard extends ConsumerWidget {
             );
           }
         }
-      } else {
+      }
+      // selling
+      else {
         // selling
         if (_focusChangeNotifierProvider.isFocused) {
           // is focussed

@@ -32,7 +32,7 @@ class SecondHome extends ConsumerWidget {
     final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
     final _connectivityStreamProvider = ref.watch(connectivityStreamProvider);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
-    var f = NumberFormat("#,###,###,###.0#", "en_US");
+    var f = NumberFormat("#,###,###,##0.0#", "en_US");
     return _connectivityStreamProvider.when(
       data: (data) => data == ConnectivityStatus.WiFi ||
               data == ConnectivityStatus.Cellular
@@ -286,11 +286,11 @@ class SecondHome extends ConsumerWidget {
                           },
                           style: ElevatedButton.styleFrom(
                               primary: _focusChangeNotifierProvider.isFocused
-                                  ? Colors.blue
-                                  : Colors.grey),
+                                  ? Colors.grey
+                                  : Colors.blue),
                           icon: Icon(Icons.swap_vertical_circle_outlined),
                           label: Text(
-                              '${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue : 'KE'}'
+                              '${_isByBuyingState.isBuying ? 'KE' : _dropdownProvider.dropDownValue}'
                                   .toUpperCase()),
                         ),
                       ],

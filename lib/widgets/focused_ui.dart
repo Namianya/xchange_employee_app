@@ -16,7 +16,7 @@ class FocusedUI extends ConsumerWidget {
     final _isByBuyingState = ref.watch(isBuyingChangeNotifier);
     final _dropdownProvider = ref.watch(dropDownChangeNotifire);
     final _inputTextChangeNotifire4 = ref.watch(inputTextChangeNotifire);
-    var f = NumberFormat("#,###,###,###.0#", "en_US");
+    var f = NumberFormat("#,###,###,##0.0#", "en_US");
 
     return Column(
       children: [
@@ -38,7 +38,6 @@ class FocusedUI extends ConsumerWidget {
             Text(
               '${f.format(_inputTextChangeNotifire4.calculatedText)}',
               style: Theme.of(context).textTheme.headline3?.copyWith(
-                    fontWeight: FontWeight.bold,
                     color: _inputTextChangeNotifire4.inputText != "" ||
                             _inputTextChangeNotifire4.inputText != null
                         ? Colors.black
@@ -61,6 +60,7 @@ class FocusedUI extends ConsumerWidget {
                 : Text(
                     _dropdownProvider.dropDownValue,
                     style: Theme.of(context).textTheme.headline5?.copyWith(
+                      fontWeight: FontWeight.bold,
                           color: _inputTextChangeNotifire4.inputText != "" ||
                                   _inputTextChangeNotifire4.inputText != null
                               ? Colors.black

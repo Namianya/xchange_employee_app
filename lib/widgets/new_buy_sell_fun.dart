@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../logic/dropdown_provider.dart';
-import '../logic/focus_change_notifire.dart';
-import '../logic/loading_change_provider.dart';
 import '../logic/riverpod_providers.dart';
 import '../logic/text_input_change_notifire.dart';
 
@@ -68,47 +66,45 @@ class PostToFirebase {
 
   PostToFirebase(this.ref);
 
-  
-
   void updateCurrentStock({
-  required BuildContext context,
-}) {
+    required BuildContext context,
+  }) {
     final _inputTextChangeNotifire2 = ref.watch(inputTextChangeNotifire);
     final _dropdownProvider = ref.watch(dropDownChangeNotifire);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
     double roundDouble(double value) {
-  num mod = pow(10.0, 2);
-  return ((value * mod).round().toDouble() / mod);
-}
+      num mod = pow(10.0, 2);
+      return ((value * mod).round().toDouble() / mod);
+    }
 
-  FirebaseFirestore.instance
-      .collection('currentStock')
-      .doc(userId)
-      .set({
-        _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd':  _dropdownProvider.dropDownValue == 'UG'
+    FirebaseFirestore.instance
+        .collection('currentStock')
+        .doc(userId)
+        .set({
+          _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd':
+              _dropdownProvider.dropDownValue == 'UG'
                   ? _currentStockStreamProvider.value!.ush +
                       roundDouble(_inputTextChangeNotifire2.calculatedText)
                   : _currentStockStreamProvider.value!.usd +
                       roundDouble(_inputTextChangeNotifire2.calculatedText),
-        'ksh': _currentStockStreamProvider.value!.ksh +
-                  double.parse(_inputTextChangeNotifire2.inputText!),
-      }, SetOptions(merge: true))
-      .then((value) => {})
-      .catchError((e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            margin: EdgeInsets.symmetric(vertical: 10),
-            duration: Duration(milliseconds: 2000),
-            backgroundColor: Colors.white,
-            content: Text(
-              'Something went wrong, please try again',
-              style: TextStyle(color: Colors.red),
+          'ksh': _currentStockStreamProvider.value!.ksh -
+              double.parse(_inputTextChangeNotifire2.inputText!),
+        }, SetOptions(merge: true))
+        .then((value) => {})
+        .catchError((e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              duration: Duration(milliseconds: 2000),
+              backgroundColor: Colors.white,
+              content: Text(
+                'Something went wrong, please try again',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
-          ),
-        );
-      });
-}
-
+          );
+        });
+  }
 }
 
 void updateCurrentStock({

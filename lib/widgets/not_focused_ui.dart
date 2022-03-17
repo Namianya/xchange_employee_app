@@ -16,7 +16,7 @@ class NotFocusedUI extends ConsumerWidget {
     final _isByBuyingState = ref.watch(isBuyingChangeNotifier);
     final _dropdownProvider = ref.watch(dropDownChangeNotifire);
     final _inputTextChangeNotifire = ref.watch(inputTextChangeNotifire);
-    var f = NumberFormat("#,###,###,###.0#", "en_US");
+    var f = NumberFormat("#,###,###,##0.0#", "en_US");
 
     return Column(
       children: [
@@ -26,7 +26,6 @@ class NotFocusedUI extends ConsumerWidget {
             Text(
               '${f.format(_inputTextChangeNotifire.calculatedText)}',
               style: Theme.of(context).textTheme.headline3?.copyWith(
-                    fontWeight: FontWeight.bold,
                     color: _inputTextChangeNotifire.inputText != ""
                         ? Colors.black
                         : Colors.grey,
@@ -59,14 +58,21 @@ class NotFocusedUI extends ConsumerWidget {
         const SizedBox(
           height: 20,
         ),
-        Text(
-          '${_inputTextChangeNotifire.inputText?.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},') ?? "Enter Amount"}',
-          style: Theme.of(context).textTheme.headline4?.copyWith(
-                color: _inputTextChangeNotifire.inputText != null ||
-                        _inputTextChangeNotifire.inputText != null
-                    ? Colors.black
-                    : Colors.grey,
-              ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '${_inputTextChangeNotifire.inputText?.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},') ?? "Enter Amount in"} ${_isByBuyingState.isBuying ? 'KSH' : _dropdownProvider.dropDownValue == 'UG' ? 'USH' : 'USD'}',
+              style: Theme.of(context).textTheme.headline4?.copyWith(
+                    fontWeight: _inputTextChangeNotifire.inputText != null
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: _inputTextChangeNotifire.inputText != null
+                        ? Colors.black
+                        : Colors.grey,
+                  ),
+            ),
+          ],
         ),
       ],
     );

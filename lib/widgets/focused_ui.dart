@@ -22,7 +22,7 @@ class FocusedUI extends ConsumerWidget {
       children: [
         Text(
           '${_inputTextChangeNotifire4.inputText ?? "Enter Amount in"}' +
-              "  ${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue == 'US' ? 'USD' : 'USH' : 'KSH'}",
+              "  ${_isByBuyingState.isBuying ? _dropdownProvider.dropDownValue == 'US' ? 'USD' : 'UGX' : 'KSH'}",
           style: Theme.of(context).textTheme.headline4?.copyWith(
                 color: _inputTextChangeNotifire4.inputText != null
                     ? Colors.black

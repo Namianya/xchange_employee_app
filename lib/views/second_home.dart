@@ -277,7 +277,7 @@ class SecondHome extends ConsumerWidget {
                               ? Icons.arrow_forward_rounded
                               : Icons.arrow_back_rounded),
                           label: Text(
-                              '${_isByBuyingState.isBuying ? 'BUYING' : 'SELLING'}'),
+                              '${_isByBuyingState.isBuying ? 'SELLING KSH' : _dropdownProvider.dropDownValue == 'US' ? 'BUYING USD' : 'BUYING UGX'}'),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => {

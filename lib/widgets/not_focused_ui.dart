@@ -62,7 +62,7 @@ class NotFocusedUI extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${_inputTextChangeNotifire.inputText?.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},') ?? "Enter Amount in"} ${_isByBuyingState.isBuying ? 'KSH' : _dropdownProvider.dropDownValue == 'UG' ? 'USH' : 'USD'}',
+              '${_inputTextChangeNotifire.inputText?.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},') ?? "Enter Amount in"} ${_isByBuyingState.isBuying ? 'KSH' : _dropdownProvider.dropDownValue == 'UG' ? 'UGX' : 'USD'}',
               style: Theme.of(context).textTheme.headline4?.copyWith(
                     fontWeight: _inputTextChangeNotifire.inputText != null
                         ? FontWeight.bold

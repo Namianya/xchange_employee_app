@@ -2,12 +2,11 @@ import 'dart:math';
 
 import 'package:fare_rate_mm/logic/dropdown_provider.dart';
 import 'package:fare_rate_mm/logic/focus_change_notifire.dart';
-import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 // import 'package:fare_rate_mm/models/rate.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
+import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 import 'package:fare_rate_mm/network/connectivity_service.dart';
 import 'package:fare_rate_mm/network/connectivity_status.dart';
-import 'package:fare_rate_mm/services/data_store.dart';
 import 'package:fare_rate_mm/views/no_network.dart';
 import 'package:fare_rate_mm/views/profile.dart';
 import 'package:fare_rate_mm/widgets/app_keyboard.dart';
@@ -249,7 +248,6 @@ class SecondHome extends ConsumerWidget {
                         ],
                       ),
                       error: (Object error, StackTrace? stackTrace) =>
-                          //? Text('err: $error'),
                           Text(
                         'Current Stock dissabled by developer',
                         style: Theme.of(context).textTheme.caption,
@@ -269,7 +267,7 @@ class SecondHome extends ConsumerWidget {
                             _isByBuyingState.setIsBuying(),
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: _isByBuyingState.isBuying
+                            backgroundColor: _isByBuyingState.isBuying
                                 ? Colors.green
                                 : Colors.indigo,
                           ),
@@ -285,9 +283,10 @@ class SecondHome extends ConsumerWidget {
                             _focusChangeNotifierProvider.setFocus(),
                           },
                           style: ElevatedButton.styleFrom(
-                              primary: _focusChangeNotifierProvider.isFocused
-                                  ? Colors.grey
-                                  : Colors.blue),
+                              backgroundColor:
+                                  _focusChangeNotifierProvider.isFocused
+                                      ? Colors.grey
+                                      : Colors.blue),
                           icon: Icon(Icons.swap_vertical_circle_outlined),
                           label: Text(
                               '${_isByBuyingState.isBuying ? 'KE' : _dropdownProvider.dropDownValue}'

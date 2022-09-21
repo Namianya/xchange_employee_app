@@ -254,18 +254,7 @@ class AppKeyboard extends ConsumerWidget {
 // *
 // *
             _postToFirebase.updateCurrentStock(context: context);
-            // updateCurrentStock(
-            //   context: context,
-            //   to: _currentStockStreamProvider.value!.ksh -
-            //       double.parse(_inputTextChangeNotifire2.inputText!),
-            //   from: _dropdownProvider.dropDownValue == 'UG'
-            //       ? _currentStockStreamProvider.value!.ush +
-            //           roundDouble(_inputTextChangeNotifire2.calculatedText)
-            //       : _currentStockStreamProvider.value!.usd +
-            //           roundDouble(_inputTextChangeNotifire2.calculatedText),
-            //   toName: 'ksh',
-            //   fromName: _dropdownProvider.dropDownValue == 'UG' ? 'ush' : 'usd',
-            // );
+           
           }
         } else {
           // ! is selling !focused

@@ -2,13 +2,11 @@ import 'package:fare_rate_mm/logic/riverpod_providers.dart';
 import 'package:fare_rate_mm/network/connectivity_service.dart';
 import 'package:fare_rate_mm/network/connectivity_status.dart';
 import 'package:fare_rate_mm/views/closed_business.dart';
-import 'package:fare_rate_mm/views/home.dart';
 import 'package:fare_rate_mm/views/login.dart';
-import 'package:fare_rate_mm/views/second_home.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:flutter/material.dart';
 import 'package:fare_rate_mm/views/no_network.dart';
+import 'package:fare_rate_mm/views/second_home.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AuthenticationWrapper extends ConsumerWidget {
   const AuthenticationWrapper({Key? key}) : super(key: key);

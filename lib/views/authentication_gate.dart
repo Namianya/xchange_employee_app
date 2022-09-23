@@ -2,7 +2,6 @@ import 'package:fare_rate_mm/views/second_home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
-import 'package:flutterfire_ui/auth/google.dart';
 // import 'package:xchange_admin/views/home.dart';
 
 class AuthenticationGate extends StatelessWidget {
@@ -17,7 +16,6 @@ class AuthenticationGate extends StatelessWidget {
             return SignInScreen(
               auth: FirebaseAuth.instance,
               providerConfigs: [
-                
                 PhoneProviderConfiguration(),
               ],
             );

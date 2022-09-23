@@ -1,10 +1,9 @@
 
-import 'package:fare_rate_mm/network/new_connectivity.dart';
+import 'package:fare_rate_mm/widgets/authentication_wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui/theme.dart';
-import 'package:fare_rate_mm/widgets/authentication_wrapper.dart';
 
 
 Future<void> main() async {

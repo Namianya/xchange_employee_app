@@ -5,8 +5,8 @@ import 'dart:math';
 import 'package:fare_rate_mm/logic/dropdown_provider.dart';
 import 'package:fare_rate_mm/logic/focus_change_notifire.dart';
 import 'package:fare_rate_mm/logic/loading_change_provider.dart';
-import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 import 'package:fare_rate_mm/logic/riverpod_providers.dart';
+import 'package:fare_rate_mm/logic/text_input_change_notifire.dart';
 import 'package:fare_rate_mm/widgets/new_buy_sell_fun.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,7 +114,7 @@ class AppKeyboard extends ConsumerWidget {
                 duration: Duration(milliseconds: 4000),
                 backgroundColor: Colors.white,
                 content: Text(
-                  'Too low float',
+                  'float is not enough',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
@@ -254,7 +254,6 @@ class AppKeyboard extends ConsumerWidget {
 // *
 // *
             _postToFirebase.updateCurrentStock(context: context);
-           
           }
         } else {
           // ! is selling !focused
@@ -348,6 +347,7 @@ class AppKeyboard extends ConsumerWidget {
               InkWell(
                 splashColor: Colors.red[900],
                 borderRadius: BorderRadius.circular(5),
+                onLongPress: () => _inputTextChangeNotifire.reset(),
                 onTap: () => _inputTextChangeNotifire.calculatedText != 0
                     ? _inputTextChangeNotifire.reset()
                     : _inputTextChangeNotifire.onKeyboardDel(),

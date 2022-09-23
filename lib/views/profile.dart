@@ -117,7 +117,7 @@ class ProfilePage extends ConsumerWidget {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  backgroundColor: Colors.red,
                 ),
                 icon: Icon(Icons.logout),
                 label: Text('Log Out'),

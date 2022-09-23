@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 ThemeData myTheme = ThemeData(
@@ -36,4 +35,5 @@ ThemeData myTheme = ThemeData(
     textTheme: TextTheme(
         bodyText2: const TextStyle().copyWith(
       fontWeight: FontWeight.bold,
-    )), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.indigo));
+    )),
+    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.indigo));

@@ -13,7 +13,6 @@ import 'package:fare_rate_mm/widgets/app_keyboard.dart';
 import 'package:flag/flag_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../widgets/focused_ui.dart';
 import '../widgets/not_focused_ui.dart';
@@ -31,7 +30,7 @@ class SecondHome extends ConsumerWidget {
     final _focusChangeNotifierProvider = ref.watch(focusChangeNotifierProvider);
     final _connectivityStreamProvider = ref.watch(connectivityStreamProvider);
     final _currentStockStreamProvider = ref.watch(currentStockStreamProvider);
-    var f = NumberFormat("#,###,###,##0.0#", "en_US");
+    // var f = NumberFormat("#,###,###,##0.0#", "en_US");
     return _connectivityStreamProvider.when(
       data: (data) => data == ConnectivityStatus.WiFi ||
               data == ConnectivityStatus.Cellular

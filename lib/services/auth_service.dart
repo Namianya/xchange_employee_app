@@ -16,6 +16,7 @@ class AuthService extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       return e.message;
     }
+    return null;
   }
   // Future<String?> signUp({required String phoneNumber}) async {
   //   try {
@@ -26,6 +27,4 @@ class AuthService extends ChangeNotifier {
   // }
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
-  
-  
 }

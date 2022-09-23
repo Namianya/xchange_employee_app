@@ -3,4 +3,6 @@ enum ConnectivityStatus {
   Cellular,
   Offline,
   LoadingConnection,
+  Connected,
+  Disconnected,
 }
